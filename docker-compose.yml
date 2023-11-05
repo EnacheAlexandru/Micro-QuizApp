@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+
+  mysql-question:
+    image: mysql:8.0.35
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: question-service
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    volumes:
+      - ./mysql-question:/var/lib/mysql
+    restart: always
+
+  question-service:
+    build:
+      context: ./question-service
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - spring.datasource.url=jdbc:mysql://mysql-question:3306/question-service
+    depends_on:
+      - mysql-question
+    restart: always
