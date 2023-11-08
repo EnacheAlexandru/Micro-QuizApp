@@ -3,6 +3,7 @@ version: "3.8"
 services:
 
   mysql-question:
+    container_name: mysql-question
     image: mysql:8.0.35
     ports:
       - "3306:3306"
@@ -16,6 +17,7 @@ services:
     restart: always
 
   question-service:
+    container_name: question-service
     build:
       context: ./question-service
       dockerfile: Dockerfile
@@ -23,6 +25,34 @@ services:
       - "8080:8080"
     environment:
       - spring.datasource.url=jdbc:mysql://mysql-question:3306/question-service
+      - eureka.client.serviceUrl.defaultZone=http://discovery-service:8761/eureka
     depends_on:
       - mysql-question
+      - discovery-service
     restart: always
+
+  discovery-service:
+    container_name: discovery-service
+    build:
+      context: ./discovery-service
+      dockerfile: Dockerfile
+    ports:
+      - "8761:8761"
+    restart: always
+
+#  question-service:
+#    build:
+#      context: ./question-service
+#      dockerfile: Dockerfile
+#    ports:
+#      - "0:8080"
+#    environment:
+#      - spring.datasource.url=jdbc:mysql://mysql-question:3306/question-service
+#      - eureka.client.serviceUrl.defaultZone=http://discovery-service:8761/eureka
+#    depends_on:
+#      - mysql-question
+#      - discovery-service
+#    restart: always
+#    deploy:
+#      mode: replicated
+#      replicas: 2
