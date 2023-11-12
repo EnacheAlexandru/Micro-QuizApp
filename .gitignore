@@ -6,7 +6,7 @@ target/
 .mvn
 mvnw
 mvnw.cmd
-mysql-question
+docker-volumes
 
 ### IntelliJ IDEA ###
 .idea
