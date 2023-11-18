@@ -6,7 +6,7 @@ import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
-import org.quiztastic.gatewayservice.config.SecurityConstants;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +17,15 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtService {
 
+    @Value("${application.security.jwt.secret-key}")
+    private String JWT_SECRET;
+
+    @Value("${application.security.jwt.expiration}")
+    private long JWT_EXPIRATION;
+
     public String generateJwt(String username) {
         Date issueDate = new Date(System.currentTimeMillis());
-        Date expireDate = new Date(issueDate.getTime() + SecurityConstants.JWT_EXPIRATION);
+        Date expireDate = new Date(issueDate.getTime() + JWT_EXPIRATION);
 
         JwtBuilder jwtBuilder = Jwts.builder()
                 .setSubject(username)
@@ -31,7 +37,7 @@ public class JwtService {
     }
 
     private Key getSignKey() {
-        return Keys.hmacShaKeyFor(SecurityConstants.JWT_SECRET.getBytes());
+        return Keys.hmacShaKeyFor(JWT_SECRET.getBytes());
     }
 
     private Claims extractClaims(String jwt) {

@@ -18,9 +18,6 @@ import java.util.List;
 public class UserApp implements UserDetails {
 
     @Id
-    @GeneratedValue
-    private Long id;
-
     private String username;
 
     private String password;

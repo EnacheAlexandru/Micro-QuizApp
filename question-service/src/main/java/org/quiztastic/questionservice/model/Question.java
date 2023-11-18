@@ -1,8 +1,6 @@
 package org.quiztastic.questionservice.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -31,4 +29,9 @@ public class Question {
     private String wrong3;
 
     private Date creation;
+
+    @Enumerated(EnumType.STRING)
+    private EntityStatus status;
+
+    private String username;
 }

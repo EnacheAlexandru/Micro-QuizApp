@@ -9,6 +9,7 @@ import org.quiztastic.gatewayservice.service.UserAppService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,10 +51,11 @@ public class GatewayController {
     }
 
     @GetMapping("/auth")
-    public ResponseEntity<AuthResponse> auth() {
+    public ResponseEntity<AuthResponse> auth(Authentication auth) {
+        String authUsername = auth.getName();
         return new ResponseEntity<>(
                 AuthResponse.builder()
-                        .jwt("secretToken")
+                        .jwt("Hello " + authUsername + "!")
                         .message("Authenticated")
                         .build(),
                 HttpStatus.OK
