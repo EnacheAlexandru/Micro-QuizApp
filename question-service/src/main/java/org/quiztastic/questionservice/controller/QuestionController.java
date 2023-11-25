@@ -2,6 +2,7 @@ package org.quiztastic.questionservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.quiztastic.questionservice.dto.AddQuestionRequest;
+import org.quiztastic.questionservice.dto.UpdateQuestionRequest;
 import org.quiztastic.questionservice.model.Question;
 import org.quiztastic.questionservice.service.JwtService;
 import org.quiztastic.questionservice.service.QuestionService;
@@ -26,24 +27,28 @@ public class QuestionController {
 
     @GetMapping("/question/user")
     public ResponseEntity<List<Question>> requestGetQuestionsByUser(
-            @RequestHeader(value = "Authorization", required = false) String jwtHeader,
-            @RequestHeader(value = "X-Share-Control", required = false) String shareHeader
+        @RequestHeader(value = "Authorization", required = false) String jwtHeader,
+        @RequestHeader(value = "X-Share-Control", required = false) String shareHeader
     ) {
         String username = getAuthorizedUsername(jwtHeader, shareHeader);
         if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        List<Question> questionList = questionService.getQuestionsByUser(username);
+        try {
+            List<Question> questionList = questionService.getQuestionsByUser(username);
+            return ResponseEntity.ok(questionList);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
 
-        return ResponseEntity.ok(questionList);
     }
 
     @PostMapping("/question/add")
-    public ResponseEntity<List<Question>> requestAddQuestion(
-            @RequestHeader(value = "Authorization", required = false) String jwtHeader,
-            @RequestHeader(value = "X-Share-Control", required = false) String shareHeader,
-            @RequestBody AddQuestionRequest questionRequest
+    public ResponseEntity<String> requestAddQuestion(
+        @RequestHeader(value = "Authorization", required = false) String jwtHeader,
+        @RequestHeader(value = "X-Share-Control", required = false) String shareHeader,
+        @RequestBody AddQuestionRequest questionRequest
     ) {
         String username = getAuthorizedUsername(jwtHeader, shareHeader);
         if (username == null) {
@@ -52,17 +57,35 @@ public class QuestionController {
 
         try {
             questionService.addQuestion(questionRequest, username);
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
-
-        return ResponseEntity.ok().build();
     }
 
 //    @GetMapping("/port")
 //    public Integer getRunningPort() {
 //        return webServerAppContext.getWebServer().getPort();
 //    }
+
+    @PostMapping("/question/update")
+    public ResponseEntity<String> requestUpdateQuestion(
+        @RequestHeader(value = "Authorization", required = false) String jwtHeader,
+        @RequestHeader(value = "X-Share-Control", required = false) String shareHeader,
+        @RequestBody UpdateQuestionRequest questionRequest
+    ) {
+        String username = getAuthorizedUsername(jwtHeader, shareHeader);
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            questionService.updateQuestion(questionRequest, username);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
     private String getAuthorizedUsername(String jwtHeader, String shareHeader) {
         if (!jwtService.isHeaderValid(jwtHeader, shareHeader)) {

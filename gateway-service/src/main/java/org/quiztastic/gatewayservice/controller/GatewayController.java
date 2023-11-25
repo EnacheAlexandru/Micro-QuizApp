@@ -1,11 +1,12 @@
 package org.quiztastic.gatewayservice.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.quiztastic.gatewayservice.config.RefreshUserDetailsService;
 import org.quiztastic.gatewayservice.dto.LoginRequest;
+import org.quiztastic.gatewayservice.model.Role;
 import org.quiztastic.gatewayservice.model.UserApp;
 import org.quiztastic.gatewayservice.service.JwtService;
 import org.quiztastic.gatewayservice.service.UserAppService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -13,7 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.MessageFormat;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -24,18 +24,33 @@ public class GatewayController {
 
     private final JwtService jwtService;
 
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder encoder;
+
+    private final RefreshUserDetailsService userDetailsService;
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginRequest request) {
-        Optional<UserApp> userApp = userAppService.getUserAppByUsername(request.getUsername());
-
-        if (userApp.isPresent() && request.getPassword() != null && passwordEncoder.matches(request.getPassword(), userApp.get().getPassword())) {
-            String generatedJwt = jwtService.generateJwt(request.getUsername());
-            return ResponseEntity.ok(generatedJwt);
+        try {
+            if (userAppService.loginUserApp(request.getUsername(), request.getPassword(), encoder)) {
+                String generatedJwt = jwtService.generateJwt(request.getUsername());
+                return ResponseEntity.ok(generatedJwt);
+            } else {
+                throw new Exception();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
         }
+    }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    @PostMapping("/register")
+    public ResponseEntity<String> register(@RequestBody LoginRequest request) {
+        try {
+            UserApp newUserApp = userAppService.createUserApp(request.getUsername(), request.getPassword(), Role.USER, encoder);
+            userDetailsService.addUserDetails(request.getUsername(), newUserApp);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping("/auth")

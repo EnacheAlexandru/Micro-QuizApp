@@ -31,18 +31,17 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public MapReactiveUserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
+    @Bean RefreshUserDetailsService userDetailsService(PasswordEncoder encoder) {
         List<UserApp> userAppList = userAppService.getUserAppList();
         if (userAppList.isEmpty()) {
             try {
                 UserApp defaultUserApp = UserApp.builder()
                         .username("default")
-                        .password(passwordEncoder.encode("default"))
+                        .password("default")
                         .role(Role.USER)
                         .build();
 
-                userAppService.createUserApp(defaultUserApp.getUsername(), defaultUserApp.getPassword(), defaultUserApp.getRole());
+                userAppService.createUserApp(defaultUserApp.getUsername(), defaultUserApp.getPassword(), defaultUserApp.getRole(), encoder);
                 userAppList.add(defaultUserApp);
             } catch (IllegalAccessException e) {
                 // ignored
@@ -52,13 +51,13 @@ public class SecurityConfig {
         List<UserDetails> userDetailsList = userAppList.stream()
                 .map(userApp -> User.builder()
                         .username(userApp.getUsername())
-                        .password(passwordEncoder.encode(userApp.getPassword()))
+                        .password(userApp.getPassword())
                         .roles(userApp.getRole().name())
                         .build()
                 )
                 .toList();
 
-        return new MapReactiveUserDetailsService(userDetailsList);
+        return new RefreshUserDetailsService(userDetailsList);
     }
 
     @Bean

@@ -7,7 +7,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -16,7 +15,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class AuthManager implements ReactiveAuthenticationManager {
 
-    private final ReactiveUserDetailsService userDetailsService;
+    private final RefreshUserDetailsService userDetailsService;
 
     private final JwtService jwtService;
 
