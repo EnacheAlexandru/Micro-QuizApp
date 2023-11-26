@@ -30,6 +30,20 @@ services:
       - ./docker-volumes/mysql-gateway:/var/lib/mysql
     restart: always
 
+  mysql-leaderboard:
+    container_name: mysql-leaderboard
+    image: mysql:8.0.35
+    ports:
+      - "3308:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: leaderboard-service
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    volumes:
+      - ./docker-volumes/mysql-leaderboard:/var/lib/mysql
+    restart: always
+
   question-service:
     container_name: question-service
     build:

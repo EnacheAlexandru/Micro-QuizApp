@@ -31,12 +31,12 @@ public class UserAppService {
 
     public UserApp createUserApp(String username, String password, Role role, PasswordEncoder encoder) throws IllegalAccessException {
         if (username == null || username.length() < 5 || username.length() > 20) {
-            logger.error(MessageFormat.format("Invalid username. Received: {0}", username));
+            logger.error(MessageFormat.format("Invalid register username. Received: {0}", username));
             throw new IllegalAccessException();
         }
 
         if (password == null || password.length() < 5 || password.length() > 20) {
-            logger.error("Invalid password");
+            logger.error("Invalid register password");
             throw new IllegalAccessException();
         }
 
@@ -63,12 +63,12 @@ public class UserAppService {
 
     public boolean loginUserApp(String username, String password, PasswordEncoder encoder) {
         if (username == null) {
-            logger.error("Invalid username. Received: null");
+            logger.error("Invalid login username. Received: null");
             return false;
         }
 
         if (password == null) {
-            logger.error("Invalid password");
+            logger.error("Invalid login password");
             return false;
         }
 

@@ -1,13 +1,13 @@
-package org.quiztastic.quizservice;
+package org.quiztastic.leaderboardservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class QuizServiceApplication {
+public class LeaderboardServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(QuizServiceApplication.class, args);
+		SpringApplication.run(LeaderboardServiceApplication.class, args);
 	}
 
 }

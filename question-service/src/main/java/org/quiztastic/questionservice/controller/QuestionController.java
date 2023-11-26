@@ -1,9 +1,7 @@
 package org.quiztastic.questionservice.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.quiztastic.questionservice.dto.AddQuestionRequest;
-import org.quiztastic.questionservice.dto.UpdateQuestionRequest;
-import org.quiztastic.questionservice.model.Question;
+import org.quiztastic.questionservice.dto.*;
 import org.quiztastic.questionservice.service.JwtService;
 import org.quiztastic.questionservice.service.QuestionService;
 import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
@@ -26,9 +24,9 @@ public class QuestionController {
     private final JwtService jwtService;
 
     @GetMapping("/question/user")
-    public ResponseEntity<List<Question>> requestGetQuestionsByUser(
-        @RequestHeader(value = "Authorization", required = false) String jwtHeader,
-        @RequestHeader(value = "X-Share-Control", required = false) String shareHeader
+    public ResponseEntity<List<GetQuestionResponse>> requestGetQuestionsByUser(
+            @RequestHeader(value = "Authorization", required = false) String jwtHeader,
+            @RequestHeader(value = "X-Share-Control", required = false) String shareHeader
     ) {
         String username = getAuthorizedUsername(jwtHeader, shareHeader);
         if (username == null) {
@@ -36,19 +34,18 @@ public class QuestionController {
         }
 
         try {
-            List<Question> questionList = questionService.getQuestionsByUser(username);
+            List<GetQuestionResponse> questionList = questionService.getQuestionsByUser(username);
             return ResponseEntity.ok(questionList);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
-
     }
 
     @PostMapping("/question/add")
-    public ResponseEntity<String> requestAddQuestion(
-        @RequestHeader(value = "Authorization", required = false) String jwtHeader,
-        @RequestHeader(value = "X-Share-Control", required = false) String shareHeader,
-        @RequestBody AddQuestionRequest questionRequest
+    public ResponseEntity<Void> requestAddQuestion(
+            @RequestHeader(value = "Authorization", required = false) String jwtHeader,
+            @RequestHeader(value = "X-Share-Control", required = false) String shareHeader,
+            @RequestBody AddQuestionRequest questionRequest
     ) {
         String username = getAuthorizedUsername(jwtHeader, shareHeader);
         if (username == null) {
@@ -69,10 +66,10 @@ public class QuestionController {
 //    }
 
     @PostMapping("/question/update")
-    public ResponseEntity<String> requestUpdateQuestion(
-        @RequestHeader(value = "Authorization", required = false) String jwtHeader,
-        @RequestHeader(value = "X-Share-Control", required = false) String shareHeader,
-        @RequestBody UpdateQuestionRequest questionRequest
+    public ResponseEntity<Void> requestUpdateQuestion(
+            @RequestHeader(value = "Authorization", required = false) String jwtHeader,
+            @RequestHeader(value = "X-Share-Control", required = false) String shareHeader,
+            @RequestBody UpdateQuestionRequest questionRequest
     ) {
         String username = getAuthorizedUsername(jwtHeader, shareHeader);
         if (username == null) {
@@ -82,6 +79,25 @@ public class QuestionController {
         try {
             questionService.updateQuestion(questionRequest, username);
             return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("question/answer")
+    public ResponseEntity<GenericResponse> requestAnswerQuestion(
+            @RequestHeader(value = "Authorization", required = false) String jwtHeader,
+            @RequestHeader(value = "X-Share-Control", required = false) String shareHeader,
+            @RequestBody AnswerQuestionRequest questionRequest
+    ) {
+        String username = getAuthorizedUsername(jwtHeader, shareHeader);
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            String correct = questionService.answerQuestion(questionRequest, username);
+            return ResponseEntity.ok(GenericResponse.builder().message(correct).build());
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

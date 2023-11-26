@@ -18,7 +18,7 @@
 
     <modules>
         <module>question-service</module>
-        <module>quiz-service</module>
+        <module>leaderboard-service</module>
         <module>discovery-service</module>
         <module>gateway-service</module>
     </modules>

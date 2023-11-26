@@ -1,10 +1,9 @@
-package org.quiztastic.quizservice;
+package org.quiztastic.leaderboardservice;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class QuizServiceApplicationTests {
+class LeaderboardServiceApplicationTests {
 
 //	@Test
 //	void contextLoads() {

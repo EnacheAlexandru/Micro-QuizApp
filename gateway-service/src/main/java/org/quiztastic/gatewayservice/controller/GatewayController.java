@@ -2,6 +2,7 @@ package org.quiztastic.gatewayservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.quiztastic.gatewayservice.config.RefreshUserDetailsService;
+import org.quiztastic.gatewayservice.dto.GenericResponse;
 import org.quiztastic.gatewayservice.dto.LoginRequest;
 import org.quiztastic.gatewayservice.model.Role;
 import org.quiztastic.gatewayservice.model.UserApp;
@@ -29,11 +30,11 @@ public class GatewayController {
     private final RefreshUserDetailsService userDetailsService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<GenericResponse> login(@RequestBody LoginRequest request) {
         try {
             if (userAppService.loginUserApp(request.getUsername(), request.getPassword(), encoder)) {
                 String generatedJwt = jwtService.generateJwt(request.getUsername());
-                return ResponseEntity.ok(generatedJwt);
+                return ResponseEntity.ok(GenericResponse.builder().message(generatedJwt).build());
             } else {
                 throw new Exception();
             }
@@ -43,7 +44,7 @@ public class GatewayController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody LoginRequest request) {
+    public ResponseEntity<Void> register(@RequestBody LoginRequest request) {
         try {
             UserApp newUserApp = userAppService.createUserApp(request.getUsername(), request.getPassword(), Role.USER, encoder);
             userDetailsService.addUserDetails(request.getUsername(), newUserApp);
@@ -54,8 +55,9 @@ public class GatewayController {
     }
 
     @GetMapping("/auth")
-    public ResponseEntity<String> auth(Authentication auth) {
+    public ResponseEntity<GenericResponse> auth(Authentication auth) {
         String authUsername = auth.getName();
-        return ResponseEntity.ok(MessageFormat.format("Hello {0}! You are authenticated", authUsername));
+        String authSuccessMessage = MessageFormat.format("Hello {0}! You are authenticated", authUsername);
+        return ResponseEntity.ok(GenericResponse.builder().message(authSuccessMessage).build());
     }
 }
