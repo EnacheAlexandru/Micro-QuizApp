@@ -11,14 +11,17 @@ import reactor.core.publisher.Mono;
 @Configuration
 public class AddShareHeaderFilter implements GlobalFilter {
 
-    @Value("${application.security.share.secret-key}")
-    private String SHARE_SECRET;
+    @Value("${application.security.shared.secret-key.header}")
+    private String SHARED_SECRET_HEADER;
+
+    @Value("${application.security.shared.secret-key}")
+    private String SHARED_SECRET;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest()
                 .mutate()
-                .header("X-Share-Control", SHARE_SECRET)
+                .header(SHARED_SECRET_HEADER, SHARED_SECRET)
                 .build();
 
         ServerWebExchange mutatedExchange = exchange

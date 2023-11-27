@@ -11,13 +11,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class JwtService {
 
-    Logger logger = LoggerFactory.getLogger(JwtService.class);
-
     @Value("${application.security.jwt.secret-key}")
     private String JWT_SECRET;
 
-    @Value("${application.security.share.secret-key}")
-    private String SHARE_SECRET;
+    Logger logger = LoggerFactory.getLogger(JwtService.class);
 
     private Claims extractClaims(String jwt) {
         return Jwts.parserBuilder()
@@ -35,10 +32,6 @@ public class JwtService {
         return extractUsername(jwtHeader.substring(7));
     }
 
-    public boolean isHeaderValid(String jwtHeader, String shareHeader) {
-        return isJwtHeaderValid(jwtHeader) && isShareHeaderValid(shareHeader);
-    }
-
     public boolean isJwtHeaderValid(String jwtHeader) {
         if (jwtHeader == null) {
             logger.error("Invalid JWT header");
@@ -52,14 +45,6 @@ public class JwtService {
             return false;
         }
 
-        return true;
-    }
-
-    public boolean isShareHeaderValid(String shareHeader) {
-        if (shareHeader == null || !shareHeader.equals(SHARE_SECRET)) {
-            logger.error("Invalid share header");
-            return false;
-        }
         return true;
     }
 }

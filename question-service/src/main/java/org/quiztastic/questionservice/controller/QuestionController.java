@@ -25,10 +25,9 @@ public class QuestionController {
 
     @GetMapping("/question/user")
     public ResponseEntity<List<GetQuestionResponse>> requestGetQuestionsByUser(
-            @RequestHeader(value = "Authorization", required = false) String jwtHeader,
-            @RequestHeader(value = "X-Share-Control", required = false) String shareHeader
+            @RequestHeader(value = "Authorization", required = false) String jwtHeader
     ) {
-        String username = getAuthorizedUsername(jwtHeader, shareHeader);
+        String username = getAuthorizedUsername(jwtHeader);
         if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -44,10 +43,9 @@ public class QuestionController {
     @PostMapping("/question/add")
     public ResponseEntity<Void> requestAddQuestion(
             @RequestHeader(value = "Authorization", required = false) String jwtHeader,
-            @RequestHeader(value = "X-Share-Control", required = false) String shareHeader,
             @RequestBody AddQuestionRequest questionRequest
     ) {
-        String username = getAuthorizedUsername(jwtHeader, shareHeader);
+        String username = getAuthorizedUsername(jwtHeader);
         if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -68,10 +66,9 @@ public class QuestionController {
     @PostMapping("/question/update")
     public ResponseEntity<Void> requestUpdateQuestion(
             @RequestHeader(value = "Authorization", required = false) String jwtHeader,
-            @RequestHeader(value = "X-Share-Control", required = false) String shareHeader,
             @RequestBody UpdateQuestionRequest questionRequest
     ) {
-        String username = getAuthorizedUsername(jwtHeader, shareHeader);
+        String username = getAuthorizedUsername(jwtHeader);
         if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -87,10 +84,9 @@ public class QuestionController {
     @PostMapping("question/answer")
     public ResponseEntity<GenericResponse> requestAnswerQuestion(
             @RequestHeader(value = "Authorization", required = false) String jwtHeader,
-            @RequestHeader(value = "X-Share-Control", required = false) String shareHeader,
             @RequestBody AnswerQuestionRequest questionRequest
     ) {
-        String username = getAuthorizedUsername(jwtHeader, shareHeader);
+        String username = getAuthorizedUsername(jwtHeader);
         if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -103,8 +99,8 @@ public class QuestionController {
         }
     }
 
-    private String getAuthorizedUsername(String jwtHeader, String shareHeader) {
-        if (!jwtService.isHeaderValid(jwtHeader, shareHeader)) {
+    private String getAuthorizedUsername(String jwtHeader) {
+        if (!jwtService.isJwtHeaderValid(jwtHeader)) {
             return null;
         }
 
