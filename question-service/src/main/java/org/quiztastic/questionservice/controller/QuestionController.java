@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping(value = "/main", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/question", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class QuestionController {
 
@@ -24,7 +24,7 @@ public class QuestionController {
 
     private final JwtService jwtService;
 
-    @GetMapping("question/user/{id}")
+    @GetMapping("/user/{id}")
     public ResponseEntity<GetQuestionResponse> requestGetQuestionByIdAndUser(
             @RequestHeader(value = "Authorization", required = false) String jwtHeader,
             @PathVariable Long id
@@ -42,7 +42,7 @@ public class QuestionController {
         }
     }
 
-    @GetMapping("/question/user")
+    @GetMapping("/user")
     public ResponseEntity<List<GetQuestionShortResponse>> requestGetQuestionsByUser(
             @RequestHeader(value = "Authorization", required = false) String jwtHeader
     ) {
@@ -59,7 +59,7 @@ public class QuestionController {
         }
     }
 
-    @GetMapping("question/other")
+    @GetMapping("/other")
     public ResponseEntity<List<Map<String, String>>> requestGetNotAnsweredQuestions(
             @RequestHeader(value = "Authorization", required = false) String jwtHeader
     ) {
@@ -76,7 +76,7 @@ public class QuestionController {
         }
     }
 
-    @GetMapping("question/other/answer")
+    @GetMapping("/other/answer")
     public ResponseEntity<List<AnsweredQuestionResponse>> requestGetAnsweredQuestions(
             @RequestHeader(value = "Authorization", required = false) String jwtHeader
     ) {
@@ -93,7 +93,7 @@ public class QuestionController {
         }
     }
 
-    @PostMapping("/question/add")
+    @PostMapping("/add")
     public ResponseEntity<Void> requestAddQuestion(
             @RequestHeader(value = "Authorization", required = false) String jwtHeader,
             @RequestBody AddQuestionRequest questionRequest
@@ -116,7 +116,7 @@ public class QuestionController {
 //        return webServerAppContext.getWebServer().getPort();
 //    }
 
-    @PostMapping("/question/update")
+    @PostMapping("/update")
     public ResponseEntity<Void> requestUpdateQuestion(
             @RequestHeader(value = "Authorization", required = false) String jwtHeader,
             @RequestBody UpdateQuestionRequest questionRequest
@@ -134,7 +134,7 @@ public class QuestionController {
         }
     }
 
-    @PostMapping("question/answer")
+    @PostMapping("/answer")
     public ResponseEntity<GenericResponse> requestAnswerQuestion(
             @RequestHeader(value = "Authorization", required = false) String jwtHeader,
             @RequestBody AnswerQuestionRequest questionRequest
