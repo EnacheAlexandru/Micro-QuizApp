@@ -2,10 +2,7 @@ package org.quiztastic.questionservice.service;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import org.quiztastic.questionservice.dto.AddQuestionRequest;
-import org.quiztastic.questionservice.dto.AnswerQuestionRequest;
-import org.quiztastic.questionservice.dto.GetQuestionResponse;
-import org.quiztastic.questionservice.dto.UpdateQuestionRequest;
+import org.quiztastic.questionservice.dto.*;
 import org.quiztastic.questionservice.model.Answer;
 import org.quiztastic.questionservice.model.EntityStatus;
 import org.quiztastic.questionservice.model.Question;
@@ -17,9 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.text.MessageFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,13 +31,76 @@ public class QuestionService {
 
     private final WebClient.Builder webClientBuilder;
 
-    public List<GetQuestionResponse> getQuestionsByUser(String username) {
-//        List<String> questions = (List<String>) em.createQuery("SELECT q.title FROM Question q WHERE q.status = 'ACTIVE'").getResultList();
+    public GetQuestionResponse getQuestionByIdAndUser(Long id, String username) throws Exception {
+        Question question = getQuestionByIdAndUser(id, username, false, true);
 
+        return GetQuestionResponse.builder()
+                .id(question.getId())
+                .title(question.getTitle())
+                .correct(question.getCorrect())
+                .wrong1(question.getWrong1())
+                .wrong2(question.getWrong2())
+                .wrong3(question.getWrong3())
+                .creation(question.getCreation())
+                .build();
+    }
+
+    // active questions created by user
+    public List<GetQuestionShortResponse> getQuestionsByUser(String username) {
         List<Question> questionList = questionRepository.findActiveQuestionsByUsername(username);
 
         return questionList.stream()
-                .map(q -> GetQuestionResponse.builder()
+                .map(q -> GetQuestionShortResponse.builder()
+                        .id(q.getId())
+                        .title(q.getTitle())
+                        .creation(q.getCreation())
+                        .build()
+                ).collect(Collectors.toList());
+    }
+
+    // active questions where user not answered and not created by him
+    public List<Map<String, String>> getNotAnsweredQuestions(String username) {
+        List<Question> questionList = questionRepository.findNotAnsweredActiveQuestions(username);
+
+        return questionList.stream()
+                .map(q -> {
+                        Map<String, String> mappedQuestion = new LinkedHashMap<>() {
+                        };
+                        mappedQuestion.put("id", q.getId().toString());
+                        mappedQuestion.put("title", q.getTitle());
+
+                        List<Integer> positionList = Arrays.asList(0, 1, 2, 3);
+                        Collections.shuffle(positionList);
+
+                        for (int i = 0; i < 4; i++) {
+                            String key = "option" + i;
+                            String value;
+                            if (positionList.get(i) == 0) {
+                                value = q.getCorrect();
+                            } else if (positionList.get(i) == 1) {
+                                value = q.getWrong1();
+                            } else if (positionList.get(i) == 2) {
+                                value = q.getWrong2();
+                            } else {
+                                value = q.getWrong3();
+                            }
+                            mappedQuestion.put(key, value);
+                        }
+
+                        mappedQuestion.put("creation", q.getCreation().toString());
+                        mappedQuestion.put("username", q.getUsername());
+
+                        return mappedQuestion;
+                    }
+                ).collect(Collectors.toList());
+    }
+
+    // questions where user answered and not created by him
+    public List<AnsweredQuestionResponse> getAnsweredQuestions(String username) {
+        List<Question> questionList = questionRepository.findAnsweredActiveQuestions(username);
+
+        return questionList.stream()
+                .map(q -> AnsweredQuestionResponse.builder()
                         .id(q.getId())
                         .title(q.getTitle())
                         .correct(q.getCorrect())
@@ -50,6 +108,7 @@ public class QuestionService {
                         .wrong2(q.getWrong2())
                         .wrong3(q.getWrong3())
                         .creation(q.getCreation())
+                        .username(q.getUsername())
                         .build()
                 ).collect(Collectors.toList());
     }
@@ -72,17 +131,12 @@ public class QuestionService {
             throw new Exception();
         }
 
-        if (answerRepository.doesUserAlreadyAnswerQuestion(username, questionRequest.getId()).equals(1L)) {
+        if (!answerRepository.doesUserAlreadyAnswerQuestion(username, questionRequest.getId()).equals(0L)) {
             logger.error(MessageFormat.format("User {0} | Already answered question with id {1}", username, questionRequest.getId()));
             throw new Exception();
         }
 
-        Question question;
-        try {
-            question = getQuestionById(questionRequest.getId(), username, false, false);
-        } catch (Exception e) {
-            throw new Exception();
-        }
+        Question question = getQuestionByIdAndUser(questionRequest.getId(), username, false, false);
 
         if (!question.getCorrect().equals(questionRequest.getAnswer()) &&
                 !question.getWrong1().equals(questionRequest.getAnswer()) &&
@@ -117,7 +171,7 @@ public class QuestionService {
         return question.getCorrect();
     }
 
-    public Question getQuestionById(Long id, String username, boolean canBeRemoved, boolean isCreator) throws Exception {
+    public Question getQuestionByIdAndUser(Long id, String username, boolean canBeRemoved, boolean isCreator) throws Exception {
         if (username == null) {
             logger.error("Invalid username. Received: null");
             throw new Exception();
@@ -223,7 +277,7 @@ public class QuestionService {
 
         Question question;
         try {
-            question = getQuestionById(questionRequest.getId(), username, false, true);
+            question = getQuestionByIdAndUser(questionRequest.getId(), username, false, true);
         } catch (Exception e) {
             throw new Exception();
         }

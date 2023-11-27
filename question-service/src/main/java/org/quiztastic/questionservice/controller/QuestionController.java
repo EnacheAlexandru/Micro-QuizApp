@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/main", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -23,8 +24,26 @@ public class QuestionController {
 
     private final JwtService jwtService;
 
+    @GetMapping("question/user/{id}")
+    public ResponseEntity<GetQuestionResponse> requestGetQuestionByIdAndUser(
+            @RequestHeader(value = "Authorization", required = false) String jwtHeader,
+            @PathVariable Long id
+    ) {
+        String username = getAuthorizedUsername(jwtHeader);
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            GetQuestionResponse question = questionService.getQuestionByIdAndUser(id, username);
+            return ResponseEntity.ok(question);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @GetMapping("/question/user")
-    public ResponseEntity<List<GetQuestionResponse>> requestGetQuestionsByUser(
+    public ResponseEntity<List<GetQuestionShortResponse>> requestGetQuestionsByUser(
             @RequestHeader(value = "Authorization", required = false) String jwtHeader
     ) {
         String username = getAuthorizedUsername(jwtHeader);
@@ -33,7 +52,41 @@ public class QuestionController {
         }
 
         try {
-            List<GetQuestionResponse> questionList = questionService.getQuestionsByUser(username);
+            List<GetQuestionShortResponse> questionList = questionService.getQuestionsByUser(username);
+            return ResponseEntity.ok(questionList);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("question/other")
+    public ResponseEntity<List<Map<String, String>>> requestGetNotAnsweredQuestions(
+            @RequestHeader(value = "Authorization", required = false) String jwtHeader
+    ) {
+        String username = getAuthorizedUsername(jwtHeader);
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            List<Map<String, String>> questionList = questionService.getNotAnsweredQuestions(username);
+            return ResponseEntity.ok(questionList);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("question/other/answer")
+    public ResponseEntity<List<AnsweredQuestionResponse>> requestGetAnsweredQuestions(
+            @RequestHeader(value = "Authorization", required = false) String jwtHeader
+    ) {
+        String username = getAuthorizedUsername(jwtHeader);
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            List<AnsweredQuestionResponse> questionList = questionService.getAnsweredQuestions(username);
             return ResponseEntity.ok(questionList);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
@@ -104,7 +157,11 @@ public class QuestionController {
             return null;
         }
 
-        return jwtService.extractUsernameHeader(jwtHeader);
+        try {
+            return jwtService.extractUsernameHeader(jwtHeader);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
 }

@@ -13,7 +13,7 @@ import java.util.Date;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetQuestionResponse {
+public class AnsweredQuestionResponse {
 
     private Long id;
 
@@ -28,4 +28,6 @@ public class GetQuestionResponse {
     private String wrong3;
 
     private Date creation;
+
+    private String username;
 }

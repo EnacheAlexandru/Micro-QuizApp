@@ -13,19 +13,11 @@ import java.util.Date;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetQuestionResponse {
+public class GetQuestionShortResponse {
 
     private Long id;
 
     private String title;
-
-    private String correct;
-
-    private String wrong1;
-
-    private String wrong2;
-
-    private String wrong3;
 
     private Date creation;
 }

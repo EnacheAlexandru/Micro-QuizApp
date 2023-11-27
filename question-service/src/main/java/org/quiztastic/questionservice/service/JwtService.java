@@ -41,7 +41,7 @@ public class JwtService {
         try {
             extractClaims(jwtHeader.substring(7));
         } catch (Exception e) {
-            logger.error("Invalid JWT header");
+            logger.error("Invalid JWT value");
             return false;
         }
 
