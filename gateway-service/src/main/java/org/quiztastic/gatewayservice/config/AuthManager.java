@@ -26,7 +26,7 @@ public class AuthManager implements ReactiveAuthenticationManager {
                 .flatMap(auth -> {
                     String username;
                     try {
-                        username = jwtService.extractUsername(auth.getCredentials());
+                        username = jwtService.extractUsername(auth.getCredentials(), null);
                     } catch (Exception e) {
                         return Mono.error(new BadCredentialsException("Invalid credentials"));
                     }
@@ -37,7 +37,7 @@ public class AuthManager implements ReactiveAuthenticationManager {
                         if (user.getUsername() == null) {
                             return Mono.error(new BadCredentialsException("Invalid credentials"));
                         }
-                        if (jwtService.validateJwt(user, auth.getCredentials())) {
+                        if (jwtService.validateJwt(user, auth.getCredentials(), null)) {
                             return Mono.justOrEmpty(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), user.getAuthorities()));
                         }
                         return Mono.error(new BadCredentialsException("Invalid credentials"));

@@ -33,7 +33,7 @@ public class GatewayController {
     public ResponseEntity<GenericResponse> login(@RequestBody LoginRequest request) {
         try {
             if (userAppService.loginUserApp(request.getUsername(), request.getPassword(), encoder)) {
-                String generatedJwt = jwtService.generateJwt(request.getUsername());
+                String generatedJwt = jwtService.generateJwt(request.getUsername(), null);
                 return ResponseEntity.ok(GenericResponse.builder().message(generatedJwt).build());
             } else {
                 throw new Exception();

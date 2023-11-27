@@ -19,10 +19,10 @@ public class HeaderAuthFilter implements Filter {
     Logger logger = LoggerFactory.getLogger(HeaderAuthFilter.class);
 
     @Value("${application.security.shared.secret-key.header}")
-    private String SHARED_SECRET_HEADER;
+    private String SECRET_SHARED_HEADER;
 
     @Value("${application.security.shared.secret-key}")
-    private String SHARED_SECRET;
+    private String SECRET_SHARED;
 
     private final JwtService jwtService;
 
@@ -31,23 +31,30 @@ public class HeaderAuthFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        String sharedValue = httpRequest.getHeader(SHARED_SECRET_HEADER);
+        String sharedBearer = httpRequest.getHeader(SECRET_SHARED_HEADER);
 
-        if (sharedValue == null) {
+        if (sharedBearer == null) {
             logger.error("Invalid shared header");
             httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
-        if (!sharedValue.equals(SHARED_SECRET)) {
+        if (!jwtService.isJwtBearerValid(sharedBearer, SECRET_SHARED)) {
             logger.error("Invalid shared value");
             httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
-        String jwtValue = httpRequest.getHeader("Authorization");
+        String jwtBearer = httpRequest.getHeader("Authorization");
 
-        if (!jwtService.isJwtHeaderValid(jwtValue)) {
+        if (jwtBearer == null) {
+            logger.error("Invalid user token header");
+            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
+        if (!jwtService.isJwtBearerValid(jwtBearer, null)) {
+            logger.error("Invalid user token value");
             httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }

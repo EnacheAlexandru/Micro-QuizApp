@@ -152,13 +152,13 @@ public class QuestionController {
         }
     }
 
-    private String getAuthorizedUsername(String jwtHeader) {
-        if (!jwtService.isJwtHeaderValid(jwtHeader)) {
+    private String getAuthorizedUsername(String jwtBearer) {
+        if (!jwtService.isJwtBearerValid(jwtBearer, null)) {
             return null;
         }
 
         try {
-            return jwtService.extractUsernameHeader(jwtHeader);
+            return jwtService.extractUsernameJwtBearer(jwtBearer, null);
         } catch (Exception e) {
             return null;
         }

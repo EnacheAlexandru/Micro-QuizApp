@@ -23,7 +23,7 @@ public class JwtService {
     @Value("${application.security.jwt.expiration}")
     private long JWT_EXPIRATION;
 
-    public String generateJwt(String username) {
+    public String generateJwt(String username, String key) {
         Date issueDate = new Date(System.currentTimeMillis());
         Date expireDate = new Date(issueDate.getTime() + JWT_EXPIRATION);
 
@@ -31,18 +31,21 @@ public class JwtService {
                 .setSubject(username)
                 .setIssuedAt(issueDate)
                 .setExpiration(expireDate)
-                .signWith(this.getSignKey());
+                .signWith(getSignKey(key));
 
         return jwtBuilder.compact();
     }
 
-    private Key getSignKey() {
-        return Keys.hmacShaKeyFor(JWT_SECRET.getBytes());
+    private Key getSignKey(String key) {
+        if (key == null) {
+            return Keys.hmacShaKeyFor(JWT_SECRET.getBytes());
+        }
+        return Keys.hmacShaKeyFor(key.getBytes());
     }
 
-    private Claims extractClaims(String jwt) {
+    private Claims extractClaims(String jwt, String key) {
         JwtParser jwtParser = Jwts.parserBuilder()
-                .setSigningKey(this.getSignKey())
+                .setSigningKey(getSignKey(key))
                 .build();
 
         return jwtParser
@@ -50,12 +53,12 @@ public class JwtService {
                 .getBody();
     }
 
-    public String extractUsername(String jwt) {
-        return this.extractClaims(jwt).getSubject();
+    public String extractUsername(String jwt, String key) {
+        return this.extractClaims(jwt, key).getSubject();
     }
 
-    public boolean validateJwt(UserDetails user, String jwt) {
-        Claims claims = this.extractClaims(jwt);
+    public boolean validateJwt(UserDetails user, String jwt, String key) {
+        Claims claims = this.extractClaims(jwt, key);
         boolean isExpired = claims.getExpiration().before(new Date(System.currentTimeMillis()));
 
         return !isExpired && user.getUsername().equals(claims.getSubject());

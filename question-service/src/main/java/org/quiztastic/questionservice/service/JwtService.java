@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.security.Key;
+
 @Service
 public class JwtService {
 
@@ -16,30 +18,38 @@ public class JwtService {
 
     Logger logger = LoggerFactory.getLogger(JwtService.class);
 
-    private Claims extractClaims(String jwt) {
+    private Claims extractClaims(String jwt, String key) {
         return Jwts.parserBuilder()
-                .setSigningKey(Keys.hmacShaKeyFor(JWT_SECRET.getBytes()))
+                .setSigningKey(getSignKey(key))
                 .build()
                 .parseClaimsJws(jwt)
                 .getBody();
     }
 
-    public String extractUsername(String jwt) {
-        return extractClaims(jwt).getSubject();
+    private Key getSignKey(String key) {
+        if (key == null) {
+            return Keys.hmacShaKeyFor(JWT_SECRET.getBytes());
+        }
+        return Keys.hmacShaKeyFor(key.getBytes());
     }
 
-    public String extractUsernameHeader(String jwtHeader) {
-        return extractUsername(jwtHeader.substring(7));
+
+    public String extractUsernameJwt(String jwt, String key) {
+        return extractClaims(jwt, key).getSubject();
     }
 
-    public boolean isJwtHeaderValid(String jwtHeader) {
-        if (jwtHeader == null) {
+    public String extractUsernameJwtBearer(String jwtBearer, String key) {
+        return extractUsernameJwt(jwtBearer.substring(7), key);
+    }
+
+    public boolean isJwtBearerValid(String jwtBearer, String key) {
+        if (jwtBearer == null) {
             logger.error("Invalid JWT header");
             return false;
         }
 
         try {
-            extractClaims(jwtHeader.substring(7));
+            extractClaims(jwtBearer.substring(7), key);
         } catch (Exception e) {
             logger.error("Invalid JWT value");
             return false;
