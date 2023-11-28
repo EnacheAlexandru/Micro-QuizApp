@@ -9,6 +9,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class LeaderboardService {
@@ -25,6 +27,27 @@ public class LeaderboardService {
                 .pages(playerListPaginated.getTotalPages())
                 .players(playerListPaginated.stream().toList())
                 .build();
+    }
+
+    public void updateLeaderboard(String username, boolean isCorrect) {
+        Optional<Player> player = leaderboardRepository.findPlayerByUsername(username);
+
+        if (player.isEmpty()) {
+            Player newPlayer = Player.builder()
+                    .username(username)
+                    .points(isCorrect ? 1L : 0L)
+                    .total(1L)
+                    .build();
+
+            leaderboardRepository.save(newPlayer);
+        } else {
+            if (isCorrect) {
+                player.get().setPoints(player.get().getPoints() + 1);
+            }
+            player.get().setTotal(player.get().getTotal() + 1);
+
+            leaderboardRepository.save(player.get());
+        }
     }
 
 }

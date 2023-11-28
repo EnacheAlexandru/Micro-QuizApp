@@ -2,14 +2,19 @@ package org.quiztastic.questionservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.quiztastic.questionservice.dto.*;
+import org.quiztastic.questionservice.model.KafkaOperation;
 import org.quiztastic.questionservice.service.JwtService;
 import org.quiztastic.questionservice.service.QuestionService;
-import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.MessageFormat;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,9 +25,13 @@ public class QuestionController {
 
 //    private final ServletWebServerApplicationContext webServerAppContext;
 
+    Logger logger = LoggerFactory.getLogger(QuestionController.class);
+
     private final QuestionService questionService;
 
     private final JwtService jwtService;
+
+    private final KafkaTemplate<String, Map<String, String>> kafkaTemplate;
 
     @GetMapping("/user/{id}")
     public ResponseEntity<GetQuestionResponse> requestGetQuestionByIdAndUser(
@@ -148,8 +157,17 @@ public class QuestionController {
         }
 
         try {
-            String correct = questionService.answerQuestion(questionRequest, username);
-            return ResponseEntity.ok(GenericResponse.builder().message(correct).build());
+            AnswerQuestionResponse questionResponse = questionService.answerQuestion(questionRequest, username);
+
+            Map<String, String> payload = new LinkedHashMap<>();
+            payload.put("operation", KafkaOperation.UPDATE_LEADERBOARD.name());
+            payload.put("token", jwtBearer);
+            payload.put("isCorrect", questionResponse.getIsCorrect().toString());
+
+            logger.info(MessageFormat.format("User {0} | Sending operation {1} with payload {2}", username, KafkaOperation.UPDATE_LEADERBOARD.name(), payload));
+            kafkaTemplate.send("notificationTopic", payload);
+
+            return ResponseEntity.ok(GenericResponse.builder().message(questionResponse.getCorrect()).build());
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

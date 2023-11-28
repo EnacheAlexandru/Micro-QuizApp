@@ -1,6 +1,5 @@
 package org.quiztastic.questionservice.service;
 
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.quiztastic.questionservice.dto.*;
 import org.quiztastic.questionservice.model.Answer;
@@ -11,7 +10,6 @@ import org.quiztastic.questionservice.repository.QuestionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -110,7 +108,7 @@ public class QuestionService {
                 ).collect(Collectors.toList());
     }
 
-    public String answerQuestion(AnswerQuestionRequest questionRequest, String username) throws Exception {
+    public AnswerQuestionResponse answerQuestion(AnswerQuestionRequest questionRequest, String username) throws Exception {
         // cannot answer if question is removed, user already answered, user created the question
 
         if (username == null) {
@@ -165,7 +163,10 @@ public class QuestionService {
         answerRepository.save(answer);
         logger.info(MessageFormat.format("User {0} | Answer to question with id {1} saved successfully", username, questionRequest.getId()));
 
-        return question.getCorrect();
+        return AnswerQuestionResponse.builder()
+                .correct(question.getCorrect())
+                .isCorrect(chosenOption == 0)
+                .build();
     }
 
     public Question getQuestionByIdAndUser(Long id, String username, boolean canBeRemoved, boolean isCreator) throws Exception {
