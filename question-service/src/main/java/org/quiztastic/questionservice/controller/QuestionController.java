@@ -26,10 +26,10 @@ public class QuestionController {
 
     @GetMapping("/user/{id}")
     public ResponseEntity<GetQuestionResponse> requestGetQuestionByIdAndUser(
-            @RequestHeader(value = "Authorization", required = false) String jwtHeader,
+            @RequestHeader(value = "Authorization", required = false) String jwtBearer,
             @PathVariable Long id
     ) {
-        String username = getAuthUsername(jwtHeader);
+        String username = getAuthUsername(jwtBearer);
         if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -45,9 +45,9 @@ public class QuestionController {
     // active questions created by user
     @GetMapping("/user")
     public ResponseEntity<List<GetQuestionShortResponse>> requestGetQuestionsByUser(
-            @RequestHeader(value = "Authorization", required = false) String jwtHeader
+            @RequestHeader(value = "Authorization", required = false) String jwtBearer
     ) {
-        String username = getAuthUsername(jwtHeader);
+        String username = getAuthUsername(jwtBearer);
         if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -63,9 +63,9 @@ public class QuestionController {
     // active questions where user not answered and not created by him
     @GetMapping("/other")
     public ResponseEntity<List<Map<String, String>>> requestGetNotAnsweredQuestions(
-            @RequestHeader(value = "Authorization", required = false) String jwtHeader
+            @RequestHeader(value = "Authorization", required = false) String jwtBearer
     ) {
-        String username = getAuthUsername(jwtHeader);
+        String username = getAuthUsername(jwtBearer);
         if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -81,9 +81,9 @@ public class QuestionController {
     // questions where user answered and not created by him
     @GetMapping("/other/answer")
     public ResponseEntity<List<AnsweredQuestionResponse>> requestGetAnsweredQuestions(
-            @RequestHeader(value = "Authorization", required = false) String jwtHeader
+            @RequestHeader(value = "Authorization", required = false) String jwtBearer
     ) {
-        String username = getAuthUsername(jwtHeader);
+        String username = getAuthUsername(jwtBearer);
         if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -98,10 +98,10 @@ public class QuestionController {
 
     @PostMapping("/add")
     public ResponseEntity<Void> requestAddQuestion(
-            @RequestHeader(value = "Authorization", required = false) String jwtHeader,
+            @RequestHeader(value = "Authorization", required = false) String jwtBearer,
             @RequestBody AddQuestionRequest questionRequest
     ) {
-        String username = getAuthUsername(jwtHeader);
+        String username = getAuthUsername(jwtBearer);
         if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -121,10 +121,10 @@ public class QuestionController {
 
     @PostMapping("/update")
     public ResponseEntity<Void> requestUpdateQuestion(
-            @RequestHeader(value = "Authorization", required = false) String jwtHeader,
+            @RequestHeader(value = "Authorization", required = false) String jwtBearer,
             @RequestBody UpdateQuestionRequest questionRequest
     ) {
-        String username = getAuthUsername(jwtHeader);
+        String username = getAuthUsername(jwtBearer);
         if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -139,10 +139,10 @@ public class QuestionController {
 
     @PostMapping("/answer")
     public ResponseEntity<GenericResponse> requestAnswerQuestion(
-            @RequestHeader(value = "Authorization", required = false) String jwtHeader,
+            @RequestHeader(value = "Authorization", required = false) String jwtBearer,
             @RequestBody AnswerQuestionRequest questionRequest
     ) {
-        String username = getAuthUsername(jwtHeader);
+        String username = getAuthUsername(jwtBearer);
         if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }

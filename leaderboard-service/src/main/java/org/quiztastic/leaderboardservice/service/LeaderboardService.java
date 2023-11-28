@@ -15,11 +15,13 @@ public class LeaderboardService {
 
     private final LeaderboardRepository leaderboardRepository;
 
-    public PaginatedLeaderboardResponse getLeaderboard(Integer page) {
+    public PaginatedLeaderboardResponse getLeaderboard(int page) {
+        int PAGE_SIZE = 10;
         Page<Player> playerListPaginated = leaderboardRepository
-                .findAll(PageRequest.of(page == null ? 0 : page - 1, 3).withSort(Sort.Direction.DESC, "points"));
+                .findAll(PageRequest.of(page - 1, PAGE_SIZE).withSort(Sort.Direction.DESC, "points"));
 
         return PaginatedLeaderboardResponse.builder()
+                .page(page)
                 .pages(playerListPaginated.getTotalPages())
                 .players(playerListPaginated.stream().toList())
                 .build();

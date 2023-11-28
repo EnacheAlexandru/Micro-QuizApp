@@ -16,6 +16,8 @@ import java.util.List;
 @NoArgsConstructor
 public class PaginatedLeaderboardResponse {
 
+    private Integer page;
+
     private Integer pages;
 
     private List<Player> players;

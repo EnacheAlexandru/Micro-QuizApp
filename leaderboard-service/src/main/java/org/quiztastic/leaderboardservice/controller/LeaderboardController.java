@@ -20,12 +20,20 @@ public class LeaderboardController {
 
     @GetMapping("/list")
     public ResponseEntity<PaginatedLeaderboardResponse> requestGetLeaderboard(
-            @RequestHeader(value = "Authorization", required = false) String jwtHeader,
-            @RequestParam(required = false) Integer page
+            @RequestHeader(value = "Authorization", required = false) String jwtBearer,
+            @RequestParam(value = "page", required = false) String pageString
     ) {
-        String username = getAuthUsername(jwtHeader);
+        String username = getAuthUsername(jwtBearer);
         if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        int page = 1;
+        try {
+            page = Integer.parseInt(pageString);
+            page = Math.max(page, 1);
+        } catch (Exception e) {
+            // ignore, default to first page
         }
 
         try {
