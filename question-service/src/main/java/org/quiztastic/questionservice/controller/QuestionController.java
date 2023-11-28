@@ -29,7 +29,7 @@ public class QuestionController {
             @RequestHeader(value = "Authorization", required = false) String jwtHeader,
             @PathVariable Long id
     ) {
-        String username = getAuthorizedUsername(jwtHeader);
+        String username = getAuthUsername(jwtHeader);
         if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -42,11 +42,12 @@ public class QuestionController {
         }
     }
 
+    // active questions created by user
     @GetMapping("/user")
     public ResponseEntity<List<GetQuestionShortResponse>> requestGetQuestionsByUser(
             @RequestHeader(value = "Authorization", required = false) String jwtHeader
     ) {
-        String username = getAuthorizedUsername(jwtHeader);
+        String username = getAuthUsername(jwtHeader);
         if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -59,11 +60,12 @@ public class QuestionController {
         }
     }
 
+    // active questions where user not answered and not created by him
     @GetMapping("/other")
     public ResponseEntity<List<Map<String, String>>> requestGetNotAnsweredQuestions(
             @RequestHeader(value = "Authorization", required = false) String jwtHeader
     ) {
-        String username = getAuthorizedUsername(jwtHeader);
+        String username = getAuthUsername(jwtHeader);
         if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -76,11 +78,12 @@ public class QuestionController {
         }
     }
 
+    // questions where user answered and not created by him
     @GetMapping("/other/answer")
     public ResponseEntity<List<AnsweredQuestionResponse>> requestGetAnsweredQuestions(
             @RequestHeader(value = "Authorization", required = false) String jwtHeader
     ) {
-        String username = getAuthorizedUsername(jwtHeader);
+        String username = getAuthUsername(jwtHeader);
         if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -98,7 +101,7 @@ public class QuestionController {
             @RequestHeader(value = "Authorization", required = false) String jwtHeader,
             @RequestBody AddQuestionRequest questionRequest
     ) {
-        String username = getAuthorizedUsername(jwtHeader);
+        String username = getAuthUsername(jwtHeader);
         if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -121,7 +124,7 @@ public class QuestionController {
             @RequestHeader(value = "Authorization", required = false) String jwtHeader,
             @RequestBody UpdateQuestionRequest questionRequest
     ) {
-        String username = getAuthorizedUsername(jwtHeader);
+        String username = getAuthUsername(jwtHeader);
         if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -139,7 +142,7 @@ public class QuestionController {
             @RequestHeader(value = "Authorization", required = false) String jwtHeader,
             @RequestBody AnswerQuestionRequest questionRequest
     ) {
-        String username = getAuthorizedUsername(jwtHeader);
+        String username = getAuthUsername(jwtHeader);
         if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -152,7 +155,7 @@ public class QuestionController {
         }
     }
 
-    private String getAuthorizedUsername(String jwtBearer) {
+    private String getAuthUsername(String jwtBearer) {
         if (!jwtService.isJwtBearerValid(jwtBearer, null)) {
             return null;
         }

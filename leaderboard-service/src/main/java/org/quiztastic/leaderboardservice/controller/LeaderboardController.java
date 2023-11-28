@@ -1,14 +1,13 @@
 package org.quiztastic.leaderboardservice.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.quiztastic.leaderboardservice.dto.PaginatedLeaderboardResponse;
 import org.quiztastic.leaderboardservice.service.JwtService;
+import org.quiztastic.leaderboardservice.service.LeaderboardService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/leaderboard", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -17,23 +16,27 @@ public class LeaderboardController {
 
     private final JwtService jwtService;
 
-    @GetMapping("/ok")
-    public ResponseEntity<String> isItOk(
-            @RequestHeader(value = "Authorization", required = false) String jwtHeader
+    private final LeaderboardService leaderboardService;
+
+    @GetMapping("/list")
+    public ResponseEntity<PaginatedLeaderboardResponse> requestGetLeaderboard(
+            @RequestHeader(value = "Authorization", required = false) String jwtHeader,
+            @RequestParam(required = false) Integer page
     ) {
-        String username = getAuthorizedUsername(jwtHeader);
+        String username = getAuthUsername(jwtHeader);
         if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         try {
-            return ResponseEntity.ok(username + " is authenticated on leaderboard");
+            PaginatedLeaderboardResponse playerList = leaderboardService.getLeaderboard(page);
+            return ResponseEntity.ok(playerList);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
-    private String getAuthorizedUsername(String jwtBearer) {
+    private String getAuthUsername(String jwtBearer) {
         if (!jwtService.isJwtBearerValid(jwtBearer, null)) {
             return null;
         }

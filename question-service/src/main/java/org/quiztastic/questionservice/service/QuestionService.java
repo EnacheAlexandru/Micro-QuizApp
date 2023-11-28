@@ -27,9 +27,9 @@ public class QuestionService {
 
     private final AnswerRepository answerRepository;
 
-    private final EntityManager em;
+//    private final EntityManager em;
 
-    private final WebClient.Builder webClientBuilder;
+//    private final WebClient.Builder webClientBuilder;
 
     public GetQuestionResponse getQuestionByIdAndUser(Long id, String username) throws Exception {
         Question question = getQuestionByIdAndUser(id, username, false, true);
@@ -45,7 +45,6 @@ public class QuestionService {
                 .build();
     }
 
-    // active questions created by user
     public List<GetQuestionShortResponse> getQuestionsByUser(String username) {
         List<Question> questionList = questionRepository.findActiveQuestionsByUsername(username);
 
@@ -58,7 +57,6 @@ public class QuestionService {
                 ).collect(Collectors.toList());
     }
 
-    // active questions where user not answered and not created by him
     public List<Map<String, String>> getNotAnsweredQuestions(String username) {
         List<Question> questionList = questionRepository.findNotAnsweredActiveQuestions(username);
 
@@ -95,7 +93,6 @@ public class QuestionService {
                 ).collect(Collectors.toList());
     }
 
-    // questions where user answered and not created by him
     public List<AnsweredQuestionResponse> getAnsweredQuestions(String username) {
         List<Question> questionList = questionRepository.findAnsweredActiveQuestions(username);
 
@@ -306,4 +303,5 @@ public class QuestionService {
             throw new Exception();
         }
     }
+
 }
