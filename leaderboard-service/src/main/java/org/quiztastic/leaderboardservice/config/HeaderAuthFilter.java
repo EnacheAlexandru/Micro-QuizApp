@@ -7,22 +7,17 @@ import lombok.RequiredArgsConstructor;
 import org.quiztastic.leaderboardservice.service.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
 public class HeaderAuthFilter implements Filter {
 
     Logger logger = LoggerFactory.getLogger(HeaderAuthFilter.class);
-
-    @Value("${application.security.shared.secret-key.header}")
-    private String SECRET_SHARED_HEADER;
-
-    @Value("${application.security.shared.secret-key}")
-    private String SECRET_SHARED;
 
     private final JwtService jwtService;
 
@@ -31,21 +26,23 @@ public class HeaderAuthFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        String sharedBearer = httpRequest.getHeader(SECRET_SHARED_HEADER);
-
-        if (sharedBearer == null) {
-            logger.error("Invalid shared header");
-            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
+        Map<String, String> paramMap = new HashMap<>();
+        if (httpRequest.getQueryString() != null) {
+            try {
+                paramMap = getParamMap(httpRequest.getQueryString());
+            } catch (Exception e) {
+                logger.error("Invalid URL parameters");
+                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
         }
 
-        if (!jwtService.isJwtBearerValid(sharedBearer, SECRET_SHARED)) {
-            logger.error("Invalid shared value");
-            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
+        String jwtBearer;
+        if (paramMap.containsKey("token")) {
+            jwtBearer = "Bearer " + paramMap.get("token");
+        } else {
+            jwtBearer = httpRequest.getHeader("Authorization");
         }
-
-        String jwtBearer = httpRequest.getHeader("Authorization");
 
         if (jwtBearer == null) {
             logger.error("Invalid user token header");
@@ -60,5 +57,17 @@ public class HeaderAuthFilter implements Filter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private Map<String, String> getParamMap(String query) {
+        String[] params = query.split("&");
+        Map<String, String> map = new HashMap<>();
+
+        for (String param : params) {
+            String name = param.split("=")[0];
+            String value = param.split("=")[1];
+            map.put(name, value);
+        }
+        return map;
     }
 }

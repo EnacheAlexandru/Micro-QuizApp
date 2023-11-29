@@ -22,9 +22,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(a -> {
-                    a.anyRequest().permitAll();
-                })
+                .authorizeHttpRequests(a -> a.anyRequest().permitAll())
                 .addFilterBefore(headerAuthFilter, BasicAuthenticationFilter.class)
                 .build();
     }

@@ -29,7 +29,7 @@ public class LeaderboardService {
                 .build();
     }
 
-    public void updateLeaderboard(String username, boolean isCorrect) {
+    public Long updateLeaderboard(String username, boolean isCorrect) {
         Optional<Player> player = leaderboardRepository.findPlayerByUsername(username);
 
         if (player.isEmpty()) {
@@ -40,14 +40,18 @@ public class LeaderboardService {
                     .build();
 
             leaderboardRepository.save(newPlayer);
-        } else {
-            if (isCorrect) {
-                player.get().setPoints(player.get().getPoints() + 1);
-            }
-            player.get().setTotal(player.get().getTotal() + 1);
 
-            leaderboardRepository.save(player.get());
+            return newPlayer.getPoints();
         }
+
+        if (isCorrect) {
+            player.get().setPoints(player.get().getPoints() + 1);
+        }
+        player.get().setTotal(player.get().getTotal() + 1);
+
+        leaderboardRepository.save(player.get());
+
+        return player.get().getPoints();
     }
 
 }

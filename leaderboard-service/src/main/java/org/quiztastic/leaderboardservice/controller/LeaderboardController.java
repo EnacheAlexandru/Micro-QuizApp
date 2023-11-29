@@ -2,6 +2,7 @@ package org.quiztastic.leaderboardservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.quiztastic.leaderboardservice.dto.PaginatedLeaderboardResponse;
+import org.quiztastic.leaderboardservice.dto.RecordWsResponse;
 import org.quiztastic.leaderboardservice.model.KafkaOperation;
 import org.quiztastic.leaderboardservice.service.JwtService;
 import org.quiztastic.leaderboardservice.service.LeaderboardService;
@@ -11,6 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.MessageFormat;
@@ -26,6 +30,8 @@ public class LeaderboardController {
     private final JwtService jwtService;
 
     private final LeaderboardService leaderboardService;
+
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     @GetMapping("/list")
     public ResponseEntity<PaginatedLeaderboardResponse> requestGetLeaderboard(
@@ -53,6 +59,19 @@ public class LeaderboardController {
         }
     }
 
+    @MessageMapping("/record")
+    @SendTo("/topic/records")
+    public ResponseEntity<RecordWsResponse> wsRecord() {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
+    public void fireWsRecord(String username, Long points) {
+        simpMessagingTemplate.convertAndSend(
+                "/topic/records",
+                RecordWsResponse.builder().username(username).points(points).build()
+        );
+    }
+
     @KafkaListener(topics = "notificationTopic")
     public void handleKafkaEvent(Map<String, String> payload) {
         logger.info(MessageFormat.format("Received operation {0} with payload {1}", KafkaOperation.UPDATE_LEADERBOARD.name(), payload));
@@ -63,7 +82,9 @@ public class LeaderboardController {
                 return;
             }
 
-            leaderboardService.updateLeaderboard(username, Boolean.parseBoolean(payload.get("isCorrect")));
+            Long points = leaderboardService.updateLeaderboard(username, Boolean.parseBoolean(payload.get("isCorrect")));
+
+            fireWsRecord(username, points);
         }
     }
 
