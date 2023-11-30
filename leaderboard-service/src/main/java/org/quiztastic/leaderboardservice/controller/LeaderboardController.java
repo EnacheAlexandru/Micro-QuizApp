@@ -1,7 +1,9 @@
 package org.quiztastic.leaderboardservice.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.quiztastic.leaderboardservice.config.RabbitMqProducer;
 import org.quiztastic.leaderboardservice.dto.NewRecordDTO;
+import org.quiztastic.leaderboardservice.dto.NewRecordQueueDTO;
 import org.quiztastic.leaderboardservice.dto.PaginatedLeaderboardResponse;
 import org.quiztastic.leaderboardservice.model.KafkaOperation;
 import org.quiztastic.leaderboardservice.service.JwtService;
@@ -22,11 +24,13 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class LeaderboardController {
 
-    Logger logger = LoggerFactory.getLogger(LeaderboardController.class);
+    private static final Logger logger = LoggerFactory.getLogger(LeaderboardController.class);
 
     private final JwtService jwtService;
 
     private final LeaderboardService leaderboardService;
+
+    private final RabbitMqProducer rabbitMqProducer;
 
     @GetMapping("/list")
     public ResponseEntity<PaginatedLeaderboardResponse> requestGetLeaderboard(
@@ -67,8 +71,13 @@ public class LeaderboardController {
             NewRecordDTO newRecordDTO = leaderboardService.updateLeaderboard(username, Boolean.parseBoolean(payload.get("isCorrect")));
 
             if (newRecordDTO.getIsNewRecord()) {
-                // TODO: send on RabbitMQ to be received by notification service
-                // send username and points
+
+                NewRecordQueueDTO newRecordQueueDTO = NewRecordQueueDTO.builder()
+                        .username(newRecordDTO.getUsername())
+                        .points(newRecordDTO.getPoints())
+                        .build();
+
+                rabbitMqProducer.sendNewRecord(newRecordQueueDTO);
             }
         }
     }

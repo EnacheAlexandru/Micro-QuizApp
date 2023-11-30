@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class NewRecordWsResponse {
+public class NewRecordQueueDTO {
 
     private String username;
 

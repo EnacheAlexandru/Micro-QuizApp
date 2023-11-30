@@ -16,7 +16,7 @@ public class JwtService {
     @Value("${application.security.jwt.secret-key}")
     private String JWT_SECRET;
 
-    Logger logger = LoggerFactory.getLogger(JwtService.class);
+    private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
 
     private Claims extractClaims(String jwt, String key) {
         return Jwts.parserBuilder()
