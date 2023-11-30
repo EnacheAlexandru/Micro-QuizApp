@@ -11,10 +11,12 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RecordWsResponse {
+public class NewRecordDTO {
 
     private String username;
 
     private Long points;
+
+    private Boolean isNewRecord;
 
 }

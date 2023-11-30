@@ -1,6 +1,7 @@
 package org.quiztastic.leaderboardservice.service;
 
 import lombok.RequiredArgsConstructor;
+import org.quiztastic.leaderboardservice.dto.NewRecordDTO;
 import org.quiztastic.leaderboardservice.dto.PaginatedLeaderboardResponse;
 import org.quiztastic.leaderboardservice.model.Player;
 import org.quiztastic.leaderboardservice.repository.LeaderboardRepository;
@@ -29,7 +30,12 @@ public class LeaderboardService {
                 .build();
     }
 
-    public Long updateLeaderboard(String username, boolean isCorrect) {
+    public NewRecordDTO updateLeaderboard(String username, boolean isCorrect) {
+        Long highScore = leaderboardRepository.findHighScore();
+        if (highScore == null) {
+            highScore = 0L;
+        }
+
         Optional<Player> player = leaderboardRepository.findPlayerByUsername(username);
 
         if (player.isEmpty()) {
@@ -41,17 +47,25 @@ public class LeaderboardService {
 
             leaderboardRepository.save(newPlayer);
 
-            return newPlayer.getPoints();
+            return NewRecordDTO.builder()
+                    .username(newPlayer.getUsername())
+                    .points(newPlayer.getPoints())
+                    .isNewRecord(newPlayer.getPoints() > highScore)
+                    .build();
         }
 
+        player.get().setTotal(player.get().getTotal() + 1);
         if (isCorrect) {
             player.get().setPoints(player.get().getPoints() + 1);
         }
-        player.get().setTotal(player.get().getTotal() + 1);
 
         leaderboardRepository.save(player.get());
 
-        return player.get().getPoints();
+        return NewRecordDTO.builder()
+                .username(player.get().getUsername())
+                .points(player.get().getPoints())
+                .isNewRecord(player.get().getPoints() > highScore)
+                .build();
     }
 
 }

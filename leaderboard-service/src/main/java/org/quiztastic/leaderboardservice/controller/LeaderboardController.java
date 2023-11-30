@@ -1,8 +1,9 @@
 package org.quiztastic.leaderboardservice.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.quiztastic.leaderboardservice.dto.NewRecordDTO;
 import org.quiztastic.leaderboardservice.dto.PaginatedLeaderboardResponse;
-import org.quiztastic.leaderboardservice.dto.RecordWsResponse;
+import org.quiztastic.leaderboardservice.dto.NewRecordWsResponse;
 import org.quiztastic.leaderboardservice.model.KafkaOperation;
 import org.quiztastic.leaderboardservice.service.JwtService;
 import org.quiztastic.leaderboardservice.service.LeaderboardService;
@@ -61,14 +62,15 @@ public class LeaderboardController {
 
     @MessageMapping("/record")
     @SendTo("/topic/records")
-    public ResponseEntity<RecordWsResponse> wsRecord() {
+    public ResponseEntity<NewRecordWsResponse> wsNewRecord() {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
-    public void fireWsRecord(String username, Long points) {
+    public void fireWsNewRecord(String username, Long points) {
+        logger.info(MessageFormat.format("User {0} set a new high score of {1} points", username, points));
         simpMessagingTemplate.convertAndSend(
                 "/topic/records",
-                RecordWsResponse.builder().username(username).points(points).build()
+                NewRecordWsResponse.builder().username(username).points(points).build()
         );
     }
 
@@ -82,9 +84,11 @@ public class LeaderboardController {
                 return;
             }
 
-            Long points = leaderboardService.updateLeaderboard(username, Boolean.parseBoolean(payload.get("isCorrect")));
+            NewRecordDTO newRecordDTO = leaderboardService.updateLeaderboard(username, Boolean.parseBoolean(payload.get("isCorrect")));
 
-            fireWsRecord(username, points);
+            if (newRecordDTO.getIsNewRecord()) {
+                fireWsNewRecord(newRecordDTO.getUsername(), newRecordDTO.getPoints());
+            }
         }
     }
 
