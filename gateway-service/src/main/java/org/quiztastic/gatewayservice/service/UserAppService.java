@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -30,12 +31,14 @@ public class UserAppService {
     }
 
     public UserApp createUserApp(String username, String password, Role role, PasswordEncoder encoder) throws IllegalAccessException {
-        if (username == null || username.length() < 5 || username.length() > 20) {
+        Pattern usernamePattern = Pattern.compile("^\\w{3,16}$");
+        if (username == null || !usernamePattern.matcher(username).matches()) {
             logger.error(MessageFormat.format("Invalid register username. Received: {0}", username));
             throw new IllegalAccessException();
         }
 
-        if (password == null || password.length() < 5 || password.length() > 20) {
+        Pattern passwordPattern = Pattern.compile("^[a-zA-Z0-9\\p{Punct}]{4,20}$");
+        if (password == null || !passwordPattern.matcher(password).matches()) {
             logger.error("Invalid register password");
             throw new IllegalAccessException();
         }
