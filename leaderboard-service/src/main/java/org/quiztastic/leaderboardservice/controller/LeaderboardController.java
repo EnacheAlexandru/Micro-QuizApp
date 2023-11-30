@@ -3,7 +3,6 @@ package org.quiztastic.leaderboardservice.controller;
 import lombok.RequiredArgsConstructor;
 import org.quiztastic.leaderboardservice.dto.NewRecordDTO;
 import org.quiztastic.leaderboardservice.dto.PaginatedLeaderboardResponse;
-import org.quiztastic.leaderboardservice.dto.NewRecordWsResponse;
 import org.quiztastic.leaderboardservice.model.KafkaOperation;
 import org.quiztastic.leaderboardservice.service.JwtService;
 import org.quiztastic.leaderboardservice.service.LeaderboardService;
@@ -13,9 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.MessageFormat;
@@ -31,8 +27,6 @@ public class LeaderboardController {
     private final JwtService jwtService;
 
     private final LeaderboardService leaderboardService;
-
-    private final SimpMessagingTemplate simpMessagingTemplate;
 
     @GetMapping("/list")
     public ResponseEntity<PaginatedLeaderboardResponse> requestGetLeaderboard(
@@ -60,20 +54,6 @@ public class LeaderboardController {
         }
     }
 
-    @MessageMapping("/record")
-    @SendTo("/topic/records")
-    public ResponseEntity<NewRecordWsResponse> wsNewRecord() {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-    }
-
-    public void fireWsNewRecord(String username, Long points) {
-        logger.info(MessageFormat.format("User {0} set a new high score of {1} points", username, points));
-        simpMessagingTemplate.convertAndSend(
-                "/topic/records",
-                NewRecordWsResponse.builder().username(username).points(points).build()
-        );
-    }
-
     @KafkaListener(topics = "notificationTopic")
     public void handleKafkaEvent(Map<String, String> payload) {
         logger.info(MessageFormat.format("Received operation {0} with payload {1}", KafkaOperation.UPDATE_LEADERBOARD.name(), payload));
@@ -87,7 +67,8 @@ public class LeaderboardController {
             NewRecordDTO newRecordDTO = leaderboardService.updateLeaderboard(username, Boolean.parseBoolean(payload.get("isCorrect")));
 
             if (newRecordDTO.getIsNewRecord()) {
-                fireWsNewRecord(newRecordDTO.getUsername(), newRecordDTO.getPoints());
+                // TODO: send on RabbitMQ to be received by notification service
+                // send username and points
             }
         }
     }

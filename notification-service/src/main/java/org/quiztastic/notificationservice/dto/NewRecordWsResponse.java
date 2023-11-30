@@ -1,4 +1,4 @@
-package org.quiztastic.leaderboardservice.dto;
+package org.quiztastic.notificationservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

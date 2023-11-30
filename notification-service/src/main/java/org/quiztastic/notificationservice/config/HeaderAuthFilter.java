@@ -1,10 +1,10 @@
-package org.quiztastic.leaderboardservice.config;
+package org.quiztastic.notificationservice.config;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.quiztastic.leaderboardservice.service.JwtService;
+import org.quiztastic.notificationservice.service.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -26,7 +26,23 @@ public class HeaderAuthFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        String jwtBearer = httpRequest.getHeader("Authorization");
+        Map<String, String> paramMap = new HashMap<>();
+        if (httpRequest.getQueryString() != null) {
+            try {
+                paramMap = getParamMap(httpRequest.getQueryString());
+            } catch (Exception e) {
+                logger.error("Invalid URL parameters");
+                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
+        }
+
+        String jwtBearer;
+        if (paramMap.containsKey("token")) {
+            jwtBearer = "Bearer " + paramMap.get("token");
+        } else {
+            jwtBearer = httpRequest.getHeader("Authorization");
+        }
 
         if (jwtBearer == null) {
             logger.error("Invalid user token header");
@@ -43,4 +59,15 @@ public class HeaderAuthFilter implements Filter {
         filterChain.doFilter(request, response);
     }
 
+    private Map<String, String> getParamMap(String query) {
+        String[] params = query.split("&");
+        Map<String, String> map = new HashMap<>();
+
+        for (String param : params) {
+            String name = param.split("=")[0];
+            String value = param.split("=")[1];
+            map.put(name, value);
+        }
+        return map;
+    }
 }

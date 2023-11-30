@@ -99,8 +99,8 @@ public class QuestionService {
                         .wrong2(a.getQuestion().getWrong2())
                         .wrong3(a.getQuestion().getWrong3())
                         .questionCreation(a.getQuestion().getCreation())
-                        .questionUsername(a.getQuestion().getUsername())
-                        .answerOption(a.getChosenOption())
+                        .username(a.getQuestion().getUsername())
+                        .option(a.getChosenOption())
                         .answerCreation(a.getCreation())
                         .build()
                 ).collect(Collectors.toList());

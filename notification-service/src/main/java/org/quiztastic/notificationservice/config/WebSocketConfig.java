@@ -1,4 +1,4 @@
-package org.quiztastic.leaderboardservice.config;
+package org.quiztastic.notificationservice.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -18,7 +18,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/leaderboard").setAllowedOriginPatterns("*").withSockJS();
+        registry.addEndpoint("/notification").setAllowedOriginPatterns("*").withSockJS();
     }
 
 }

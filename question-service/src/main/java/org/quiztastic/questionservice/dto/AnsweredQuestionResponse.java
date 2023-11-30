@@ -29,9 +29,9 @@ public class AnsweredQuestionResponse {
 
     private Date questionCreation;
 
-    private String questionUsername;
+    private String username;
 
-    private Integer answerOption;
+    private Integer option;
 
     private Date answerCreation;
 }
