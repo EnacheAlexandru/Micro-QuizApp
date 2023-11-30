@@ -26,8 +26,8 @@ public class NotificationController {
 
     @MessageMapping("/record")
     @SendTo("/topic/records")
-    public ResponseEntity<NewRecordQueueDTO> newRecordWebSocket() {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    public NewRecordQueueDTO newRecordWebSocket() {
+        return NewRecordQueueDTO.builder().username(null).points(null).build();
     }
 
     @RabbitListener(queues = {"${rabbitmq.queue.name}"})
