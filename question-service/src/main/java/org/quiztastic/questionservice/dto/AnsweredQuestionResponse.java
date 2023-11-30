@@ -27,7 +27,11 @@ public class AnsweredQuestionResponse {
 
     private String wrong3;
 
-    private Date creation;
+    private Date questionCreation;
 
-    private String username;
+    private String questionUsername;
+
+    private Integer answerOption;
+
+    private Date answerCreation;
 }

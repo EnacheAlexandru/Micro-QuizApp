@@ -25,10 +25,6 @@ public class QuestionService {
 
     private final AnswerRepository answerRepository;
 
-//    private final EntityManager em;
-
-//    private final WebClient.Builder webClientBuilder;
-
     public GetQuestionResponse getQuestionByIdAndUser(Long id, String username) throws Exception {
         Question question = getQuestionByIdAndUser(id, username, false, true);
 
@@ -92,18 +88,20 @@ public class QuestionService {
     }
 
     public List<AnsweredQuestionResponse> getAnsweredQuestions(String username) {
-        List<Question> questionList = questionRepository.findAnsweredActiveQuestions(username);
+        List<Answer> answerList = answerRepository.findAnsweredActiveQuestions(username);
 
-        return questionList.stream()
-                .map(q -> AnsweredQuestionResponse.builder()
-                        .id(q.getId())
-                        .title(q.getTitle())
-                        .correct(q.getCorrect())
-                        .wrong1(q.getWrong1())
-                        .wrong2(q.getWrong2())
-                        .wrong3(q.getWrong3())
-                        .creation(q.getCreation())
-                        .username(q.getUsername())
+        return answerList.stream()
+                .map(a -> AnsweredQuestionResponse.builder()
+                        .id(a.getQuestion().getId())
+                        .title(a.getQuestion().getTitle())
+                        .correct(a.getQuestion().getCorrect())
+                        .wrong1(a.getQuestion().getWrong1())
+                        .wrong2(a.getQuestion().getWrong2())
+                        .wrong3(a.getQuestion().getWrong3())
+                        .questionCreation(a.getQuestion().getCreation())
+                        .questionUsername(a.getQuestion().getUsername())
+                        .answerOption(a.getChosenOption())
+                        .answerCreation(a.getCreation())
                         .build()
                 ).collect(Collectors.toList());
     }

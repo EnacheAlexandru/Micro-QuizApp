@@ -14,6 +14,4 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     @Query("SELECT q FROM Answer a RIGHT JOIN a.question q WHERE a.username IS NULL AND q.username != ?1 AND q.status = 'ACTIVE'")
     List<Question> findNotAnsweredActiveQuestions(String username);
 
-    @Query("SELECT q FROM Answer a INNER JOIN a.question q WHERE a.username = ?1 AND q.username != ?1")
-    List<Question> findAnsweredActiveQuestions(String username);
 }
