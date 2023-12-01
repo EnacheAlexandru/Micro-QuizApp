@@ -44,30 +44,6 @@ services:
       - ./docker-volumes/mysql-leaderboard:/var/lib/mysql
     restart: always
 
-  question-service:
-    container_name: question-service
-    build:
-      context: ./question-service
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    environment:
-      - spring.datasource.url=jdbc:mysql://mysql-question:3306/question-service
-      - eureka.client.serviceUrl.defaultZone=http://discovery-service:8761/eureka
-    depends_on:
-      - mysql-question
-      - discovery-service
-    restart: always
-
-  discovery-service:
-    container_name: discovery-service
-    build:
-      context: ./discovery-service
-      dockerfile: Dockerfile
-    ports:
-      - "8761:8761"
-    restart: always
-
   zookeeper:
     container_name: zookeeper
     image: confluentinc/cp-zookeeper:7.0.1
@@ -86,7 +62,7 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:9093
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
@@ -98,20 +74,98 @@ services:
       - "5672:5672"
       - "15672:15672"
 
+  discovery-service:
+    container_name: discovery-service
+    build:
+      context: ./discovery-service
+      dockerfile: Dockerfile
+    ports:
+      - "8761:8761"
+    restart: always
+
+  gateway-service:
+    container_name: gateway-service
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - spring.datasource.url=jdbc:mysql://mysql-gateway:3306/gateway-service
+      - eureka.client.serviceUrl.defaultZone=http://discovery-service:8761/eureka
+    depends_on:
+      - mysql-gateway
+      - discovery-service
+    restart: always
 
 #  question-service:
+#    container_name: question-service
 #    build:
 #      context: ./question-service
 #      dockerfile: Dockerfile
 #    ports:
-#      - "0:8080"
+#      - "8081:8081"
 #    environment:
 #      - spring.datasource.url=jdbc:mysql://mysql-question:3306/question-service
 #      - eureka.client.serviceUrl.defaultZone=http://discovery-service:8761/eureka
+#      - spring.kafka.bootstrap-servers=kafka:9093
 #    depends_on:
 #      - mysql-question
 #      - discovery-service
+#      - kafka
 #    restart: always
-#    deploy:
-#      mode: replicated
-#      replicas: 2
+
+  leaderboard-service:
+    container_name: leaderboard-service
+    build:
+      context: ./leaderboard-service
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      - spring.datasource.url=jdbc:mysql://mysql-leaderboard:3306/leaderboard-service
+      - eureka.client.serviceUrl.defaultZone=http://discovery-service:8761/eureka
+      - spring.kafka.bootstrap-servers=kafka:9093
+      - spring.rabbitmq.host=rabbitmq
+    depends_on:
+      - mysql-leaderboard
+      - discovery-service
+      - kafka
+      - rabbitmq
+    restart: always
+
+  notification-service:
+    container_name: notification-service
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    environment:
+      - eureka.client.serviceUrl.defaultZone=http://discovery-service:8761/eureka
+      - spring.rabbitmq.host=rabbitmq
+    depends_on:
+      - discovery-service
+      - rabbitmq
+    restart: always
+
+#for testing load balancer
+  question-service:
+    build:
+      context: ./question-service
+      dockerfile: Dockerfile
+    ports:
+      - "0:8081"
+    environment:
+      - spring.datasource.url=jdbc:mysql://mysql-question:3306/question-service
+      - eureka.client.serviceUrl.defaultZone=http://discovery-service:8761/eureka
+      - spring.kafka.bootstrap-servers=kafka:9093
+      - server.port=0
+    depends_on:
+      - mysql-question
+      - discovery-service
+      - kafka
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 2

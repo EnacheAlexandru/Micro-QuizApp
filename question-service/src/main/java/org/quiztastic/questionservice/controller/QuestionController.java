@@ -7,6 +7,7 @@ import org.quiztastic.questionservice.service.JwtService;
 import org.quiztastic.questionservice.service.QuestionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class QuestionController {
 
-//    private final ServletWebServerApplicationContext webServerAppContext;
+    private final ServletWebServerApplicationContext webServerAppContext;
 
     Logger logger = LoggerFactory.getLogger(QuestionController.class);
 
@@ -123,10 +124,11 @@ public class QuestionController {
         }
     }
 
-//    @GetMapping("/port")
-//    public Integer getRunningPort() {
-//        return webServerAppContext.getWebServer().getPort();
-//    }
+    // for testing load balancer
+    @GetMapping("/port")
+    public Integer getRunningPort() {
+        return webServerAppContext.getWebServer().getPort();
+    }
 
     @PostMapping("/update")
     public ResponseEntity<Void> requestUpdateQuestion(
