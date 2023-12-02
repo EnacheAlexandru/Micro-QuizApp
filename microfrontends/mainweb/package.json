@@ -40,6 +40,7 @@
     "net": "^1.0.2",
     "axios": "^1.6.2",
     "zustand": "^4.4.7",
-    "react-loader-spinner": "^5.4.5"
+    "react-loader-spinner": "^5.4.5",
+    "react-router-dom": "6.20.1"
   }
 }
