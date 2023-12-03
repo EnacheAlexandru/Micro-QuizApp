@@ -44,14 +44,6 @@ const NotAnsweredPage = () => {
     }
   }, [questionsList]);
 
-  useEffect(() => {
-    console.log(optionMap);
-  }, [optionMap]);
-
-  useEffect(() => {
-    console.log(answeredMap);
-  }, [answeredMap]);
-
   const handleGetQuestions = async () => {
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 100));

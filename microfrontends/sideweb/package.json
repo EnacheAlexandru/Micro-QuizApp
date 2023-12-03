@@ -35,6 +35,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
 
+    "sockjs-client": "^1.6.1",
+    "stompjs": "^2.3.3",
     "zustand": "^4.4.7"
   }
 }

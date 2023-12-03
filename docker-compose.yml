@@ -169,3 +169,21 @@ services:
     deploy:
       mode: replicated
       replicas: 2
+
+  mainweb:
+    container_name: mainweb
+    build:
+      context: ./microfrontends/mainweb
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    stdin_open: true
+
+  sideweb:
+    container_name: sideweb
+    build:
+      context: ./microfrontends/sideweb
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    stdin_open: true

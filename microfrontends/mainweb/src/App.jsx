@@ -1,8 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
-import "./index.scss";
 import LoginPage from "./pages/LoginPage";
 import QuestionsPage from "./pages/QuestionsPage";
 import NotFoundPage from "./pages/NotFoundPage";
@@ -10,10 +8,18 @@ import AnsweredPage from "./pages/AnsweredPage";
 import LeaderboardPage from "./pages/LeaderboardPage";
 import MyQuestionsPage from "./pages/MyQuestionsPage";
 import MyQuestionDetailsPage from "./pages/MyQuestionDetailsPage";
+import { ToastContainer } from "react-toastify";
+
+import 'react-toastify/dist/ReactToastify.css';
+import "./index.scss";
+import Notification from "./components/Notification";
 
 const App = () => {
   return (
-    <Router>
+    <div>
+      <Notification />
+      <ToastContainer />
+      <Router>
         <Routes>
           <Route exact path="/" element={<LoginPage />}></Route>
           <Route exact path="/user" element={<MyQuestionsPage />}></Route>
@@ -24,6 +30,7 @@ const App = () => {
           <Route exact path="*" element={<NotFoundPage />}></Route> 
         </Routes>
       </Router>
+    </div>
   )
 };
 
