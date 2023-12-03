@@ -21,7 +21,7 @@ const AnsweredPage = () => {
 
   const handleGetAnswered = async () => {
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 100));
     await axios
       .get("http://localhost:8080/question/other/answer", {
         headers: { Authorization: `Bearer ${storeToken}` },
@@ -76,9 +76,9 @@ const AnsweredPage = () => {
                     <div className="font-normal text-gray-700 dark:text-gray-400" style={{fontSize: '13px'}}>Created on: {DateFormatter.format(item.questionCreation)}</div>
                     <div className="font-normal mb-1 text-gray-700 dark:text-gray-400" style={{fontSize: '13px'}}>Answered on: {DateFormatter.format(item.answerCreation)}</div>
                     <div className="font-bold rounded-lg pl-1 bg-green-300 text-gray-700 dark:text-gray-400">{item.correct}</div>
-                    <div className={`font-bold rounded-lg ${item.option === 1 ? 'bg-red-300 pl-1' : ''} text-gray-700 dark:text-gray-400`}>{item.wrong1}</div>
-                    <div className={`font-bold rounded-lg ${item.option === 2 ? 'bg-red-300 pl-1' : ''} text-gray-700 dark:text-gray-400`}>{item.wrong2}</div>
-                    <div className={`font-bold rounded-lg ${item.option === 3 ? 'bg-red-300 pl-1' : ''} text-gray-700 dark:text-gray-400`}>{item.wrong3}</div>
+                    <div className={`font-bold rounded-lg pl-1 mt-1 ${item.option === 1 ? 'bg-red-300' : ''} text-gray-700 dark:text-gray-400`}>{item.wrong1}</div>
+                    <div className={`font-bold rounded-lg pl-1 mt-1 ${item.option === 2 ? 'bg-red-300' : ''} text-gray-700 dark:text-gray-400`}>{item.wrong2}</div>
+                    <div className={`font-bold rounded-lg pl-1 mt-1 ${item.option === 3 ? 'bg-red-300' : ''} text-gray-700 dark:text-gray-400`}>{item.wrong3}</div>
                 </div>
             </React.Fragment>
           ))}

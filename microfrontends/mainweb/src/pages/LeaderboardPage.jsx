@@ -17,10 +17,10 @@ const LeaderboardPage = () => {
     let position = 0;
 
     useEffect(() => {
-        handleLeaderboard(1);
+        handleGetLeaderboard(1);
       }, []);
     
-    const handleLeaderboard = async (page) => {
+    const handleGetLeaderboard = async (page) => {
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 100));
     await axios
@@ -46,7 +46,7 @@ const LeaderboardPage = () => {
           <Header />
           <div className="m-5 flex justify-center">
             <button
-              onClick={() => handleLeaderboard(1)}
+              onClick={() => handleGetLeaderboard(1)}
               className="text-white bg-blue-500 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
               Refresh
@@ -78,7 +78,7 @@ const LeaderboardPage = () => {
                       `}>
                           <div className="flex justify-between">
                               <div className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{`${position + 10 * (leaderboard.page - 1)}. ${item.username} ${item.username === storeUsername ? "(You)" : ""}`}</div>
-                              <div className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{item.points}</div>
+                              <div className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{`${item.points} / ${item.total}`}</div>
                           </div>
                       </div>
                   </React.Fragment>
@@ -87,7 +87,7 @@ const LeaderboardPage = () => {
               <div className="flex justify-center content-center items-center">
                 <div className="m-1 flex">
                   <button
-                    onClick={() => { if (leaderboard.page > 1) {handleLeaderboard(1) }}}
+                    onClick={() => { if (leaderboard.page > 1) { handleGetLeaderboard(1) }}}
                     className="text-white bg-blue-500 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                   >
                     {"<<"}
@@ -95,7 +95,7 @@ const LeaderboardPage = () => {
                 </div>
                 <div className="m-1 flex">
                   <button
-                    onClick={() => { if (leaderboard.page > 1) {handleLeaderboard(leaderboard.page - 1) }}}
+                    onClick={() => { if (leaderboard.page > 1) { handleGetLeaderboard(leaderboard.page - 1) }}}
                     className="text-white bg-blue-500 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                   >
                     {"<"}
@@ -106,7 +106,7 @@ const LeaderboardPage = () => {
                 </div>
                 <div className="m-1 flex">
                   <button
-                    onClick={() => { if (leaderboard.page < leaderboard.pages) {handleLeaderboard(leaderboard.page + 1) }}}
+                    onClick={() => { if (leaderboard.page < leaderboard.pages) { handleGetLeaderboard(leaderboard.page + 1) }}}
                     className="text-white bg-blue-500 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                   >
                     {">"}
@@ -114,7 +114,7 @@ const LeaderboardPage = () => {
                 </div>
                 <div className="m-1 flex">
                   <button
-                    onClick={() => { if (leaderboard.page < leaderboard.pages) {handleLeaderboard(leaderboard.pages) }}}
+                    onClick={() => { if (leaderboard.page < leaderboard.pages) { handleGetLeaderboard(leaderboard.pages) }}}
                     className="text-white bg-blue-500 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                   >
                     {">>"}

@@ -1,11 +1,21 @@
 import React from "react";
 import LoginHeader from "../components/LoginHeader";
 import { useNavigate } from "react-router-dom";
+import useStore from "sideweb/store";
 
 const NotFoundPage = () => {
+  const {
+    setUsername: setStoreUsername,
+    setToken: setStoreToken,
+    setSelectedPage: setStoreSelectedPage,
+  } = useStore();
+
   const navigateTo = useNavigate();
 
   const handleLogin = () => {
+    setStoreSelectedPage(2);
+    setStoreUsername("");
+    setStoreToken("");
     navigateTo("/");
   };
 

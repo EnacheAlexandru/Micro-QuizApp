@@ -105,7 +105,7 @@ const LoginPage = () => {
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           onKeyDownCapture={handleOnEnter}
-          className="border border-gray-500 p-1.5"
+          className="border border-gray-500 p-1.5 rounded-lg"
         ></input>
       </div>
 
@@ -120,27 +120,9 @@ const LoginPage = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           onKeyDownCapture={handleOnEnter}
-          className="border border-gray-500 p-1.5"
+          className="border border-gray-500 p-1.5 rounded-lg"
         ></input>
       </div>
-
-      {isInvalidAuth ? (
-        <div className="m-5 text-red-600">{INVALID_AUTH_ERROR_MSG}</div>
-      ) : (
-        <div className="m-5"></div>
-      )}
-
-      {isInvalidRegister ? (
-        <div className="m-5 text-red-600">{INVALID_REGISTER_ERROR_MSG}</div>
-      ) : (
-        <div className="m-5"></div>
-      )}
-
-      {isSuccessRegister ? (
-        <div className="m-5 text-green-600">{SUCCESS_REGISTER_MSG}</div>
-      ) : (
-        <div className="m-5"></div>
-      )}
 
       <div className="m-5 mt-5 flex">
         <div>
@@ -161,8 +143,26 @@ const LoginPage = () => {
         </div>
       </div>
 
+      {isInvalidAuth ? (
+        <div className="ml-5 my-1 text-red-600">{INVALID_AUTH_ERROR_MSG}</div>
+      ) : (
+        <div></div>
+      )}
+
+      {isInvalidRegister ? (
+        <div className="ml-5 my-1 text-red-600">{INVALID_REGISTER_ERROR_MSG}</div>
+      ) : (
+        <div></div>
+      )}
+
+      {isSuccessRegister ? (
+        <div className="ml-5 my-1 text-green-600">{SUCCESS_REGISTER_MSG}</div>
+      ) : (
+        <div></div>
+      )}
+
       {isLoading ? (
-        <div className="m-5">
+        <div className="ml-5">
           <ProgressBar
             height="80"
             width="80"

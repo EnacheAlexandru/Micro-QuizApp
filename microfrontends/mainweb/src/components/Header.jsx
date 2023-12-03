@@ -14,8 +14,7 @@ const Header = () => {
 
   const handleMyQuestions = () => {
     setStoreSelectedPage(0);
-    navigateTo("/other");
-    // navigateTo("/user");
+    navigateTo("/user");
   };
 
   const handleAnswered = () => {
