@@ -30,8 +30,7 @@ const Header = () => {
 
   const handleLeaderboard = () => {
     setStoreSelectedPage(3);
-    navigateTo("/other");
-    // navigateTo("/leaderboard");
+    navigateTo("/leaderboard");
   };
 
   const handleLogout = () => {

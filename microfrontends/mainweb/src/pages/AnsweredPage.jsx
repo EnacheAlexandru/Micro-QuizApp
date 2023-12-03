@@ -3,13 +3,17 @@ import Header from "../components/Header";
 import { ProgressBar } from "react-loader-spinner";
 import useStore from "sideweb/store";
 import axios from "axios";
+import DateFormatter from "../utils/DateFormatter";
 
 const AnsweredPage = () => {
   const { token: storeToken } = useStore();
+
   const FETCH_LIST_ERROR_MSG = "Error fetching list or session expired";
   const [isErrorFetch, setIsErrorFetch] = useState(false);
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [answeredList, setAnsweredList] = useState([])
 
   useEffect(() => {
     handleGetAnswered();
@@ -25,6 +29,7 @@ const AnsweredPage = () => {
       .then((response) => {
         console.log(response);
         setIsErrorFetch(false);
+        setAnsweredList(response.data)
       })
       .catch((error) => {
         console.log(error);
@@ -43,7 +48,7 @@ const AnsweredPage = () => {
           onClick={handleGetAnswered}
           className="text-white bg-blue-500 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         >
-          Refreshh
+          Refresh
         </button>
       </div>
       {isLoading ? (
@@ -61,20 +66,27 @@ const AnsweredPage = () => {
         <div className="m-5 text-red-600 flex justify-center">
           {FETCH_LIST_ERROR_MSG}
         </div>
-      ) : (
-        <div className="m-5 flex justify-center">
-          <div>
-            <input type="radio" value="Male" name="0" /> Male
-            <input type="radio" value="Female" name="0" /> Female
-            <input type="radio" value="Other" name="0" /> Other
-          </div>
-          <div>
-            <input type="radio" value="Male" name="1" /> Malee
-            <input type="radio" value="Female" name="1" /> Femalee
-            <input type="radio" value="Other" name="1" /> Otherr
-          </div>
+      ) : answeredList.length > 0 ? (
+        <div className="m-5 flex flex-wrap justify-evenly gap-4">
+          {answeredList.map((item) => (
+            <React.Fragment key={item.id}>
+                <div className="block w-96 max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow">
+                    <div className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{item.title}</div>
+                    <div className="font-normal text-gray-700 dark:text-gray-400" style={{fontSize: '13px'}}>By: {item.username}</div>
+                    <div className="font-normal text-gray-700 dark:text-gray-400" style={{fontSize: '13px'}}>Created on: {DateFormatter.format(item.questionCreation)}</div>
+                    <div className="font-normal mb-1 text-gray-700 dark:text-gray-400" style={{fontSize: '13px'}}>Answered on: {DateFormatter.format(item.answerCreation)}</div>
+                    <div className="font-bold rounded-lg pl-1 bg-green-300 text-gray-700 dark:text-gray-400">{item.correct}</div>
+                    <div className={`font-bold rounded-lg ${item.option === 1 ? 'bg-red-300 pl-1' : ''} text-gray-700 dark:text-gray-400`}>{item.wrong1}</div>
+                    <div className={`font-bold rounded-lg ${item.option === 2 ? 'bg-red-300 pl-1' : ''} text-gray-700 dark:text-gray-400`}>{item.wrong2}</div>
+                    <div className={`font-bold rounded-lg ${item.option === 3 ? 'bg-red-300 pl-1' : ''} text-gray-700 dark:text-gray-400`}>{item.wrong3}</div>
+                </div>
+            </React.Fragment>
+          ))}
         </div>
-      )}
+        ) : (
+          <div className="font-bold text-2xl flex justify-center">You did not answer any questions!</div>
+        )
+      }
     </div>
   );
 };
