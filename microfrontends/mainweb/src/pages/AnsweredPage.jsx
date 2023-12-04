@@ -4,6 +4,7 @@ import { ProgressBar } from "react-loader-spinner";
 import useStore from "sideweb/store";
 import axios from "axios";
 import DateFormatter from "../utils/DateFormatter";
+import webSocketManager from "../utils/WebSocketManager";
 
 const AnsweredPage = () => {
   const { token: storeToken } = useStore();
@@ -17,6 +18,7 @@ const AnsweredPage = () => {
 
   useEffect(() => {
     handleGetAnswered();
+    webSocketManager.connect(storeToken);
   }, []);
 
   const handleGetAnswered = async () => {

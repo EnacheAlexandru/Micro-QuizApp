@@ -5,6 +5,7 @@ import useStore from "sideweb/store";
 import axios from "axios";
 import DateFormatter from "../utils/DateFormatter";
 import { useNavigate } from "react-router-dom";
+import webSocketManager from "../utils/WebSocketManager";
 
 const MyQuestionsPage = () => {
     const { token: storeToken, setSelectedPage: setStoreSelectedPage } = useStore();
@@ -19,6 +20,7 @@ const MyQuestionsPage = () => {
   
     useEffect(() => {
       handleGetMyQuestions();
+      webSocketManager.connect(storeToken);
     }, []);
 
     const handleNavDetailsPage = (questionId) => {

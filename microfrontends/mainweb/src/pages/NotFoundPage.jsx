@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import LoginHeader from "../components/LoginHeader";
 import { useNavigate } from "react-router-dom";
 import useStore from "sideweb/store";
+import webSocketManager from "../utils/WebSocketManager";
 
 const NotFoundPage = () => {
   const {
@@ -18,6 +19,10 @@ const NotFoundPage = () => {
     setStoreToken("");
     navigateTo("/");
   };
+
+  useEffect(() => {
+    webSocketManager.disconnect();
+  }, []);
 
   return (
     <div>

@@ -4,6 +4,7 @@ import { ProgressBar } from "react-loader-spinner";
 import useStore from "sideweb/store";
 import axios from "axios";
 import DateFormatter from "../utils/DateFormatter";
+import webSocketManager from "../utils/WebSocketManager";
 
 const NotAnsweredPage = () => {
   const { token: storeToken } = useStore();
@@ -14,11 +15,14 @@ const NotAnsweredPage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const [questionsList, setQuestionsList] = useState([]);
+
+  // for dynamic generation
   const [answeredMap, setAnsweredMap] = useState({});
   const [optionMap, setOptionMap] = useState({});
 
   useEffect(() => {
     handleGetQuestions();
+    webSocketManager.connect(storeToken);
   }, []);
 
   const updateSetAnsweredMap = (key, value) => {

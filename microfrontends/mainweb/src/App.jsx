@@ -12,12 +12,10 @@ import { ToastContainer } from "react-toastify";
 
 import 'react-toastify/dist/ReactToastify.css';
 import "./index.scss";
-import Notification from "./components/Notification";
 
 const App = () => {
   return (
     <div>
-      <Notification />
       <ToastContainer />
       <Router>
         <Routes>

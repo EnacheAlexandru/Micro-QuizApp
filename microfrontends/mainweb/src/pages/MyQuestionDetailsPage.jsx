@@ -4,6 +4,7 @@ import { ProgressBar } from "react-loader-spinner";
 import useStore from "sideweb/store";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import webSocketManager from "../utils/WebSocketManager";
 
 const MyQuestionDetailsPage = () => {
   const { questionId } = useParams();
@@ -36,6 +37,7 @@ const MyQuestionDetailsPage = () => {
 
   useEffect(() => {
     handleGetMyQuestionDetails();
+    webSocketManager.connect(storeToken);
   }, []);
 
   useEffect(() => {

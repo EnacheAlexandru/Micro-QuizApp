@@ -50,6 +50,7 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    restart: always
 
   kafka:
     container_name: kafka
@@ -66,6 +67,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    restart: always
 
   rabbitmq:
     container_name: rabbitmq
@@ -73,6 +75,7 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    restart: always
 
   discovery-service:
     container_name: discovery-service
@@ -149,7 +152,7 @@ services:
       - rabbitmq
     restart: always
 
-#for testing load balancer
+  #for testing load balancer
   question-service:
     build:
       context: ./question-service

@@ -4,6 +4,7 @@ import { ProgressBar } from "react-loader-spinner";
 import LoginHeader from "../components/LoginHeader";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import webSocketManager from "../utils/WebSocketManager";
 
 const LoginPage = () => {
   const INVALID_AUTH_ERROR_MSG = "Invalid credentials";
@@ -82,6 +83,10 @@ const LoginPage = () => {
       handleLogin();
     }
   };
+
+  useEffect(() => {
+    webSocketManager.disconnect();
+  }, [])
 
   useEffect(() => {
     // we need to make sure that the token is loaded before going to the next page
