@@ -5,9 +5,11 @@ import useStore from "sideweb/store";
 import axios from "axios";
 import DateFormatter from "../utils/DateFormatter";
 import webSocketManager from "../utils/WebSocketManager";
+import { useNavigate } from "react-router-dom";
 
 const AnsweredPage = () => {
   const { token: storeToken } = useStore();
+  const navigateTo = useNavigate();
 
   const FETCH_LIST_ERROR_MSG = "Error fetching list or session expired";
   const [isErrorFetch, setIsErrorFetch] = useState(false);
@@ -17,6 +19,9 @@ const AnsweredPage = () => {
   const [answeredList, setAnsweredList] = useState([])
 
   useEffect(() => {
+    if (storeToken === undefined || storeToken === null || storeToken === '') {
+      navigateTo('/')
+    }
     handleGetAnswered();
     webSocketManager.connect(storeToken);
   }, []);
@@ -74,10 +79,11 @@ const AnsweredPage = () => {
             <React.Fragment key={item.id}>
                 <div className="block w-96 max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow">
                     <div className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{item.title}</div>
+                    {item.status === 'ACTIVE' ? <div></div> : <div className="font-bold text-red-500" style={{fontSize: '13px'}}>{item.status}</div>}
                     <div className="font-normal text-gray-700 dark:text-gray-400" style={{fontSize: '13px'}}>By: {item.username}</div>
                     <div className="font-normal text-gray-700 dark:text-gray-400" style={{fontSize: '13px'}}>Created on: {DateFormatter.format(item.questionCreation)}</div>
                     <div className="font-normal mb-1 text-gray-700 dark:text-gray-400" style={{fontSize: '13px'}}>Answered on: {DateFormatter.format(item.answerCreation)}</div>
-                    <div className="font-bold rounded-lg pl-1 bg-green-300 text-gray-700 dark:text-gray-400">{item.correct}</div>
+                    <div className="font-bold rounded-lg pl-1 bg-green-300 dark:text-gray-400">{item.correct}</div>
                     <div className={`font-bold rounded-lg pl-1 mt-1 ${item.option === 1 ? 'bg-red-300' : ''} text-gray-700 dark:text-gray-400`}>{item.wrong1}</div>
                     <div className={`font-bold rounded-lg pl-1 mt-1 ${item.option === 2 ? 'bg-red-300' : ''} text-gray-700 dark:text-gray-400`}>{item.wrong2}</div>
                     <div className={`font-bold rounded-lg pl-1 mt-1 ${item.option === 3 ? 'bg-red-300' : ''} text-gray-700 dark:text-gray-400`}>{item.wrong3}</div>

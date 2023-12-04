@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.quiztastic.questionservice.model.EntityStatus;
 
 import java.util.Date;
 
@@ -26,6 +27,8 @@ public class AnsweredQuestionResponse {
     private String wrong2;
 
     private String wrong3;
+
+    private EntityStatus status;
 
     private Date questionCreation;
 

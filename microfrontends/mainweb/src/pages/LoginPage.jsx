@@ -120,8 +120,8 @@ const LoginPage = () => {
       </div>
       <div className="ml-5">
         <input
-          // type="password"
-          type="input"
+          type="password"
+          // type="input"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           onKeyDownCapture={handleOnEnter}

@@ -46,6 +46,10 @@ public class QuestionService {
                 .map(q -> GetQuestionShortResponse.builder()
                         .id(q.getId())
                         .title(q.getTitle())
+                        .correct(q.getCorrect())
+                        .wrong1(q.getWrong1())
+                        .wrong2(q.getWrong2())
+                        .wrong3(q.getWrong3())
                         .creation(q.getCreation())
                         .build()
                 ).collect(Collectors.toList());
@@ -98,6 +102,7 @@ public class QuestionService {
                         .wrong1(a.getQuestion().getWrong1())
                         .wrong2(a.getQuestion().getWrong2())
                         .wrong3(a.getQuestion().getWrong3())
+                        .status(a.getQuestion().getStatus())
                         .questionCreation(a.getQuestion().getCreation())
                         .username(a.getQuestion().getUsername())
                         .option(a.getChosenOption())
@@ -303,4 +308,32 @@ public class QuestionService {
         }
     }
 
+    public void deleteQuestion(Long id, String username) throws Exception {
+        if (username == null) {
+            logger.error("Invalid username. Received: null");
+            throw new Exception();
+        }
+
+        if (id == null) {
+            logger.error(MessageFormat.format("User {0} | Invalid id. Received: null", username));
+            throw new Exception();
+        }
+
+        Question question;
+        try {
+            question = getQuestionByIdAndUser(id, username, false, true);
+        } catch (Exception e) {
+            throw new Exception();
+        }
+
+        question.setStatus(EntityStatus.REMOVED);
+
+        try {
+            questionRepository.save(question);
+            logger.info(MessageFormat.format("User {0} | Question with id {1} deleted successfully", username, question.getId()));
+        } catch (Exception e) {
+            logger.error(MessageFormat.format("User {0} | Error updating question with id {1}", username, question.getId()));
+            throw new Exception();
+        }
+    }
 }

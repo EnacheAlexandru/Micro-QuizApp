@@ -130,10 +130,35 @@ public class QuestionController {
         return webServerAppContext.getWebServer().getPort();
     }
 
-    @PostMapping("/update")
-    public ResponseEntity<Void> requestUpdateQuestion(
+    /**
+     * not really working as intended
+     * sets the status of the old question to REMOVED, but adds the updated question with status ACTIVE
+     * this means that the updated question can be answered by the others,
+     * even if they have already answered to the old question
+     * must be refactored
+     **/
+//    @PostMapping("/update")
+//    public ResponseEntity<Void> requestUpdateQuestion(
+//            @RequestHeader(value = "Authorization", required = false) String jwtBearer,
+//            @RequestBody UpdateQuestionRequest questionRequest
+//    ) {
+//        String username = getAuthUsername(jwtBearer);
+//        if (username == null) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//        }
+//
+//        try {
+//            questionService.updateQuestion(questionRequest, username);
+//            return ResponseEntity.ok().build();
+//        } catch (Exception e) {
+//            return ResponseEntity.badRequest().build();
+//        }
+//    }
+
+    @PostMapping("/delete")
+    public ResponseEntity<Void> requestDeleteQuestion(
             @RequestHeader(value = "Authorization", required = false) String jwtBearer,
-            @RequestBody UpdateQuestionRequest questionRequest
+            @RequestBody IdDTO request
     ) {
         String username = getAuthUsername(jwtBearer);
         if (username == null) {
@@ -141,7 +166,7 @@ public class QuestionController {
         }
 
         try {
-            questionService.updateQuestion(questionRequest, username);
+            questionService.deleteQuestion(request.getId(), username);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();

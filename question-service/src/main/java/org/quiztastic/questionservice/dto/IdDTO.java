@@ -6,26 +6,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.util.Date;
-
 @Getter
 @Setter
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetQuestionShortResponse {
+public class IdDTO {
 
     private Long id;
 
-    private String title;
-
-    private String correct;
-
-    private String wrong1;
-
-    private String wrong2;
-
-    private String wrong3;
-
-    private Date creation;
 }

@@ -5,9 +5,11 @@ import useStore from "sideweb/store";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import webSocketManager from "../utils/WebSocketManager";
+import { useNavigate } from "react-router-dom";
 
 const MyQuestionDetailsPage = () => {
   const { questionId } = useParams();
+  const navigateTo = useNavigate();
 
   const { token: storeToken } = useStore();
 
@@ -36,6 +38,9 @@ const MyQuestionDetailsPage = () => {
   const [wrong3, setWrong3] = useState("");
 
   useEffect(() => {
+    if (storeToken === undefined || storeToken === null || storeToken === '') {
+      navigateTo('/')
+    }
     handleGetMyQuestionDetails();
     webSocketManager.connect(storeToken);
   }, []);

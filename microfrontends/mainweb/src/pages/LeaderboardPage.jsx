@@ -4,9 +4,11 @@ import { ProgressBar } from "react-loader-spinner";
 import useStore from "sideweb/store";
 import axios from "axios";
 import webSocketManager from "../utils/WebSocketManager";
+import { useNavigate } from "react-router-dom";
 
 const LeaderboardPage = () => {
   const { token: storeToken, username: storeUsername } = useStore();
+  const navigateTo = useNavigate();
 
   const FETCH_LIST_ERROR_MSG = "Error fetching list or session expired";
   const [isErrorFetch, setIsErrorFetch] = useState(false);
@@ -18,6 +20,9 @@ const LeaderboardPage = () => {
   let position = 0;
 
   useEffect(() => {
+    if (storeToken === undefined || storeToken === null || storeToken === '') {
+      navigateTo('/');
+    }
     handleGetLeaderboard(1);
     webSocketManager.connect(storeToken);
   }, []);

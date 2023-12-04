@@ -11,6 +11,6 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
     @Query("SELECT COUNT(a) FROM Answer a WHERE a.username = ?1 AND a.question.id = ?2")
     Long doesUserAlreadyAnswerQuestion(String username, Long id);
 
-    @Query("SELECT a FROM Answer a INNER JOIN a.question q WHERE a.username = ?1 AND q.username != ?1")
+    @Query("SELECT a FROM Answer a INNER JOIN a.question q WHERE a.username = ?1 AND q.username != ?1 ORDER BY a.creation DESC")
     List<Answer> findAnsweredActiveQuestions(String username);
 }

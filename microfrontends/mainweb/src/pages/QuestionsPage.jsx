@@ -5,9 +5,11 @@ import useStore from "sideweb/store";
 import axios from "axios";
 import DateFormatter from "../utils/DateFormatter";
 import webSocketManager from "../utils/WebSocketManager";
+import { useNavigate } from "react-router-dom";
 
 const NotAnsweredPage = () => {
   const { token: storeToken } = useStore();
+  const navigateTo = useNavigate();
 
   const FETCH_LIST_ERROR_MSG = "Error processing or session expired";
   const [isErrorFetch, setIsErrorFetch] = useState(false);
@@ -21,6 +23,9 @@ const NotAnsweredPage = () => {
   const [optionMap, setOptionMap] = useState({});
 
   useEffect(() => {
+    if (storeToken === undefined || storeToken === null || storeToken === '') {
+      navigateTo('/')
+    }
     handleGetQuestions();
     webSocketManager.connect(storeToken);
   }, []);
