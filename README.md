@@ -1,9 +1,9 @@
-# QuizApp
-### *An application using microservice and module federation architectures*
+# Micro-QuizApp
+### *Application using microservices and module federation*
 
 ## Overview
 
-QuizApp is an application where users can compete with other users in answering correctly as many questions as possible in order to climb up the leaderboard. 
+Micro-QuizApp is an application using microservices and module federation where users can compete with other users by answering correctly as many questions as possible with the goal of climbing the leaderboard.
 
 Using an authentication system, users can register and log in to immediately begin answering questions created by other users. They can also view a list of previously answered questions and even add their own questions for others to answer. 
 
