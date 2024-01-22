@@ -120,9 +120,14 @@ Figure 4
 
 ![my_questions_page](https://github.com/EnacheAlexandru/quiz-microservices/assets/63500798/703ad828-9de6-4146-951e-9a6ba480f523)
 
-## Docker
+## Installation
 
-The front-end and back-end, as well as databases and pub/sub queues are dockerized inside `docker-compose.yml` file. The whole application can be run inside Docker on the same network using the following command:
+The front-end and back-end, as well as databases and pub/sub queues are dockerized inside `docker-compose.yml` file.
+Before running the containers, we have to generate the `target` folder that contains the `.jar` file, for each microservice. It is enough to run in the root folder a command to generate the `.jar` files for each microservice:
+```
+mvn clean package
+```
+After we generated the `.jar` files, Docker can generate the images and the whole application can be run inside the containers on the same network using the following command:
 ```
 docker-compose up
 ```
